@@ -1,4 +1,4 @@
-// app/(app)/_layout.tsx
+// app/(app)/_layout.js
 import { Drawer } from "expo-router/drawer";
 
 export default function AppLayout() {
@@ -13,7 +13,6 @@ export default function AppLayout() {
         drawerActiveTintColor: "#000",
       }}
     >
-      {/* Main content → Tabs group */}
       <Drawer.Screen
         name="(tabs)"
         options={{
@@ -21,7 +20,6 @@ export default function AppLayout() {
         }}
       />
 
-      {/* Filter sidebar screen */}
       <Drawer.Screen
         name="filter"
         options={{

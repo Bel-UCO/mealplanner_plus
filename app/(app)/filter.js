@@ -1,3 +1,4 @@
+import { router, useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -7,11 +8,18 @@ import {
 } from "react-native";
 
 const Filter = () => {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.headerRow}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              // always go back to tabs root (e.g. home tab)
+              router.back();
+            }}
+          >
             <Text style={styles.backArrow}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>FILTER</Text>
