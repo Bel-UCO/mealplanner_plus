@@ -33,7 +33,8 @@ class RandomizerController extends Controller
         $ingredients  = $request->input('ingredients', []);
         $ingredientCategories = $request->input('ingredient_categories', []);
         $utensils     = $request->input('utensils', []);
-
+        $diet = request("diet");
+        
         if (is_string($ingredientCategories)) {
             $ingredientCategories = array_map('intval', explode(',', $ingredientCategories));
         }

@@ -1,15 +1,24 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 const Menu = ({ title, image, onPress }) => {
-  console.log(image);
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.cardContainer}
+      onPress={onPress}        // ← THIS WAS MISSING
     >
       <View style={styles.card}>
-        <Image source={{uri:"https://xsaajlpecgffmsbllgby.supabase.co/storage/v1/object/public/mealplanner/"+ image}} style={styles.image} resizeMode="cover" />
+        <Image
+          source={{
+            uri:
+              "https://xsaajlpecgffmsbllgby.supabase.co/storage/v1/object/public/mealplanner/" +
+              image,
+          }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+
         <View style={styles.textBar}>
           <Text style={styles.title} numberOfLines={1}>
             {title}
@@ -28,8 +37,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     backgroundColor: "#000",
-    elevation: 3, // Android shadow
-    shadowColor: "#000", // iOS shadow
+    elevation: 3,
+    shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
@@ -42,7 +51,7 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: "rgba(0,0,0,0.6)", // grey/black bar like the example
+    backgroundColor: "rgba(0,0,0,0.6)",
   },
   title: {
     color: "#fff",

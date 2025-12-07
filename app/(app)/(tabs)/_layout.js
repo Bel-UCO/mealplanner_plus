@@ -20,32 +20,42 @@ export default function Layout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ color, focused }) => {
-            return <Image source={require("../../../resource/randomize.png")}></Image>
-          },
-          tabBarLabel:()=>null,
-          header:()=><Header></Header>
+          tabBarIcon: () => (
+            <Image source={require("../../../resource/randomize.png")} />
+          ),
+          tabBarLabel: () => null,
+          header: () => <Header />,
         }}
       />
+
       <Tabs.Screen
         name="explore"
         options={{
-          tabBarIcon: ({ color, focused }) => {
-            return <Image source={require("../../../resource/explore.png")}></Image>
-
-          },
-          tabBarLabel:()=>null,
-          header:()=><Header></Header>
+          tabBarIcon: () => (
+            <Image source={require("../../../resource/explore.png")} />
+          ),
+          tabBarLabel: () => null,
+          header: () => <Header />,
         }}
       />
+
       <Tabs.Screen
         name="profile"
         options={{
-          tabBarIcon: ({ color, focused }) => {
-            return <Image source={require("../../../resource/profile.png")}></Image>
-          },
-          tabBarLabel:()=>null,
-          header:()=><Header></Header>
+          tabBarIcon: () => (
+            <Image source={require("../../../resource/profile.png")} />
+          ),
+          tabBarLabel: () => null,
+          header: () => <Header />,
+        }}
+      />
+
+      {/* detail route: part of tabs nav, but NOT shown in tab bar */}
+      <Tabs.Screen
+        name="recipe/[id]"
+        options={{
+          href: null,            // ← hides it from the tab bar / sitemap
+          headerTitle: "Recipe Detail",
         }}
       />
     </Tabs>
