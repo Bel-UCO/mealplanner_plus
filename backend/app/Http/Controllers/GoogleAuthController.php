@@ -8,37 +8,38 @@ use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
-    public function redirect()
+    public function redirect(Request $request)
     {
+        if ($request->has('redirect_back')) {
+            $request->session()->put('redirect_back', $request->query('redirect_back'));
+        }
+
         return Socialite::driver('google')->redirect();
     }
 
-    public function callback()
+    public function callback(Request $request)
     {
-        try {
-            $googleUser = Socialite::driver('google')->user();
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Google login failed',
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        $googleUser = Socialite::driver('google')->user();
 
-        // Create or update user
         $user = User::updateOrCreate(
-            ['email' => $googleUser->getEmail()],
-            ['google_id' => $googleUser->getId()]
+            ['google_id' => $googleUser->getId()],
+            ['email'     => $googleUser->getEmail()]
         );
 
-        // Sanctum token
-        $token = $user->createToken('google_login')->plainTextToken;
+        $token = $user->createToken('google_mobile')->plainTextToken;
 
-        return response()->json([
-            'token' => $token,
-            'user' => [
-                'id'    => $user->id,
-                'email' => $user->email,
-            ]
+        $redirectBack = $request->session()->pull(
+            'redirect_back',
+            'exp://127.0.0.1:19000' // fallback, not really used
+        );
+
+        $separator   = str_contains($redirectBack, '?') ? '&' : '?';
+        $redirectUrl = $redirectBack . $separator . 'token=' . urlencode($token);
+
+        \Log::info('Redirecting back to app with token', [
+            'redirectUrl' => $redirectUrl,
         ]);
+
+        return redirect()->away($redirectUrl);
     }
 }
