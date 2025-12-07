@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import useToken from "../util/useToken";
+import { FilterRecipeProvider } from "../util/filterHooks";
 
 export default function RootLayout() {
   const { token, loading } = useToken();
@@ -23,25 +24,27 @@ export default function RootLayout() {
   }, [token, loading, segments]);
 
   return (
-    <Stack
-      screenOptions={{
-        tabBarActiveTintColor: "#000",
-        headerStyle: {
-          backgroundColor: "#FB9637",
-        },
-        headerShadowVisible: false,
-        headerTintColor: "#000",
-        tabBarStyle: {
-          backgroundColor: "#FB9637",
-        },
-      }}
-    >
-      {/* public screens */}
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="login-callback" options={{ headerShown: false }} />
+    <FilterRecipeProvider>
+      <Stack
+        screenOptions={{
+          tabBarActiveTintColor: "#000",
+          headerStyle: {
+            backgroundColor: "#FB9637",
+          },
+          headerShadowVisible: false,
+          headerTintColor: "#000",
+          tabBarStyle: {
+            backgroundColor: "#FB9637",
+          },
+        }}
+      >
+        {/* public screens */}
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="login-callback" options={{ headerShown: false }} />
 
-      {/* protected group */}
-      <Stack.Screen name="(app)" options={{ headerShown: false }} />
-    </Stack>
+        {/* protected group */}
+        <Stack.Screen name="(app)" options={{ headerShown: false }} />
+      </Stack>
+    </FilterRecipeProvider>
   );
 }

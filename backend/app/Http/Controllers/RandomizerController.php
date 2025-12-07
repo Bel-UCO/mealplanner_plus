@@ -55,7 +55,7 @@ class RandomizerController extends Controller
             'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
         ])
             ->whereHas('belongsToRecipeCategory', function ($q) {
-                $q->where('name', 'Breakfast');
+                $q->where('name', request('type'));
             });
 
         if (!empty($difficulties)) {
