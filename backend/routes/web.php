@@ -31,6 +31,6 @@ Route::get('/', function () {
 });
 
 Route::get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);
-Route::get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);
-Route::get('/get-preferences', [UserPreferencesController::class, 'getPreferences']);
-Route::post('/set-preferences', [UserPreferencesController::class, 'updatePreferences']);
+Route::middleware('auth:sanctum')->get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);
+Route::middleware('auth:sanctum')->get('/get-preferences', [UserPreferencesController::class, 'getPreferences']);
+Route::middleware('auth:sanctum')->post('/set-preferences', [UserPreferencesController::class, 'updatePreferences']);
