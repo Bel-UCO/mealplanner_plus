@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('user_preferences', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->timestamps();
-            $table->uuid('id_user');
-            $table->foreign('id_user')->references('id')->on('users');
+            $table->foreignUuid('id_user')->references('id')->on('users');
             $table->string('search_by')->check("search_by IN ('explore', 'saved')");
             $table->string('difficulty')->nullable();
             $table->integer('time');

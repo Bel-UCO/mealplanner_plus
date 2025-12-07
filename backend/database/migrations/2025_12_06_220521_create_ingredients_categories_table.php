@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('ingredients_categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->timestamps();
             $table->string('name');
+            $table->timestamps();
         });
     }
 

@@ -15,8 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->timestamps();
             $table->string('name');
-            $table->uuid('id_ingredient_category');
-            $table->foreign('id_ingredient_category')->references('id')->on('ingredients_categories');
+            $table->foreignUuid('id_ingredient_category')->references('id')->on('ingredients_categories');
         });
     }
 

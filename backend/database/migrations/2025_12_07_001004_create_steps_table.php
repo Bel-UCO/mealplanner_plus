@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('steps', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->timestamps();
-            $table->uuid('id_recipe');
-            $table->foreign('id_recipe')->references('id')->on('recipes');
+            $table->foreignUuid('id_recipe')->references('id')->on('recipes');
             $table->string('steps');
         });
     }
