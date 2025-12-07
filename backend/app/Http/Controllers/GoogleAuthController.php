@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
+use App\Models\UserPreferences;
 
 class GoogleAuthController extends Controller
 {
@@ -26,6 +27,14 @@ class GoogleAuthController extends Controller
             ['email'     => $googleUser->getEmail()]
         );
 
+        $userPreferences = UserPreferences::firstOrCreate(
+            ['id_user' => $user->id],       // kondisi existing
+            [
+                'search_by' => 'explore',   // nilai default saat dibuat
+                'time'      => 30,
+            ]
+        );
+
         $token = $user->createToken('google_mobile')->plainTextToken;
 
         $redirectBack = $request->session()->pull(
@@ -35,10 +44,6 @@ class GoogleAuthController extends Controller
 
         $separator   = str_contains($redirectBack, '?') ? '&' : '?';
         $redirectUrl = $redirectBack . $separator . 'token=' . urlencode($token);
-
-        \Log::info('Redirecting back to app with token', [
-            'redirectUrl' => $redirectUrl,
-        ]);
 
         return redirect()->away($redirectUrl);
     }

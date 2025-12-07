@@ -119,4 +119,5 @@ class RandomizerController extends Controller
 
         return $breakfasts->inRandomOrder()->get();
     }
+
 }

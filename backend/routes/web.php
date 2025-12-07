@@ -5,6 +5,8 @@ use App\Http\Controllers\RandomizerController;
 use App\Models\Recipe;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecipeController;
+use App\Models\UserPreferences;
+use App\Http\Controllers\UserPreferencesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +32,5 @@ Route::get('/', function () {
 
 Route::get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);
 Route::get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);
+Route::get('/get-preferences', [UserPreferencesController::class, 'getPreferences']);
+Route::post('/set-preferences', [UserPreferencesController::class, 'updatePreferences']);
