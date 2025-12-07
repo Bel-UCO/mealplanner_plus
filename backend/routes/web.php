@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\RandomizerController;
 use App\Models\Recipe;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecipeController;
@@ -28,3 +29,4 @@ Route::get('/', function () {
 });
 
 Route::get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);
+Route::get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);

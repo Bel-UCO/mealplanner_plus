@@ -16,8 +16,8 @@ return new class extends Migration
             $table->timestamps();
             $table->string('name');
             $table->string('image');
-            $table->bigInteger('id_recipe_category');
             $table->string('diet')->check("diet IN ('vegetarian', 'vegan')")->nullable();
+            $table->bigInteger('id_recipe_category');
             $table->foreign('id_recipe_category')->references('id')->on('recipe_categories');
             $table->integer('difficulty');
             $table->integer('time');
