@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
-const GuestLayout = (props) => {
+const LoadingLayout = (props) => {
 
 
   return <View style={styles.container}>{props.children}</View>;
@@ -9,10 +9,10 @@ const GuestLayout = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FB9637",
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
 });
 
-export default GuestLayout;
+export default LoadingLayout;
