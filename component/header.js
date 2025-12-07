@@ -1,11 +1,19 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
 
 const Header = () => {
+  const router = useRouter();
+
+  const openFilter = () => {
+    // Navigate to the filter "drawer" screen
+    router.push("/filter");
+  };
+
   return (
     <View style={styles.header}>
       <Text style={styles.headerText}>MEALPLANNER+</Text>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={openFilter}>
         <View style={styles.content}>
           <Image
             source={require("../resource/filter.png")}
@@ -24,10 +32,10 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingHorizontal: 12,
     backgroundColor: "#FB9637",
-    flexDirection: "row", // put text & icon in a row
-    alignItems: "center", // vertically center them
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    borderBottomWidth: 3, // white line at bottom
+    borderBottomWidth: 3,
     borderBottomColor: "#FFFFFF",
   },
   headerText: {
@@ -38,7 +46,15 @@ const styles = StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
-    tintColor: "#000", // make sure icon is black
+    tintColor: "#000",
+  },
+  // optional, if you want touch area styles:
+  button: {
+    padding: 4,
+  },
+  content: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

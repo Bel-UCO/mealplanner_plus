@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
@@ -23,11 +24,13 @@ class GoogleAuthController extends Controller
             ], 400);
         }
 
+        // Create or update user
         $user = User::updateOrCreate(
             ['email' => $googleUser->getEmail()],
             ['google_id' => $googleUser->getId()]
         );
 
+        // Sanctum token
         $token = $user->createToken('google_login')->plainTextToken;
 
         return response()->json([
