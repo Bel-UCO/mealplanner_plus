@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class UserSavedRecipe extends Model
 {
     use HasFactory;
+
+    public function belongsToUser() {
+        return $this->belongsTo(User::class, 'id_user');
+    }
+
+    public function hasRecipe() {
+        return $this->hasOne(Recipe::class, 'id', 'id_recipe');
+    }
 }

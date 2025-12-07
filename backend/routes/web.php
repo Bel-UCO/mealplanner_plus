@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\GoogleAuthController;
+use App\Models\Recipe;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\RecipeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,5 @@ Route::get('/auth/google/mobile-done', function () {
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);

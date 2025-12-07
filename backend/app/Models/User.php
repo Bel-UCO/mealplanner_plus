@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -17,7 +18,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    
+
     protected $fillable = [
         'email',
         'google_id',
@@ -42,4 +43,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function hasUserPreference() {
+        return $this->hasOne(UserPreferences::class, 'id_user');
+    }
+
+    public function hasManyUserSavedRecipe() {
+        return $this->hasMany(UserSavedRecipe::class, 'id_user');
+    }
+
+    public function hasUserList() {
+        return $this->hasOne(UserList::class, 'id_user');
+    }
 }

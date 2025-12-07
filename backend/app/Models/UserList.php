@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class UserList extends Model
 {
     use HasFactory;
+
+    public function belongsToUser() {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }
