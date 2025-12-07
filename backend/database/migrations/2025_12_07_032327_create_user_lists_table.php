@@ -12,19 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_lists', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->timestamps();
-            $table->uuid('id_user');
+            $table->bigInteger('id_user');
             $table->foreign('id_user')->references('id')->on('users');
-            $table->uuid('breakfast');
+            $table->bigInteger('breakfast');
             $table->foreign('breakfast')->references('id')->on('recipes');
-            $table->uuid('lunch');
+            $table->bigInteger('lunch');
             $table->foreign('lunch')->references('id')->on('recipes');
-            $table->uuid('dinner');
+            $table->bigInteger('dinner');
             $table->foreign('dinner')->references('id')->on('recipes');
-            $table->uuid('snack_dessert')->nullable();
+            $table->bigInteger('snack_dessert')->nullable();
             $table->foreign('snack_dessert')->references('id')->on('recipes');
-            $table->uuid('beverage')->nullable();
+            $table->bigInteger('beverage')->nullable();
         });
     }
 

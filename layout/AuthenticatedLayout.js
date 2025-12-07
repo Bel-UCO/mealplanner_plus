@@ -1,8 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
 const AuthenticatedLayout = (props) => {
-  const localStorage = ""
-
+  const localStorage = "";
 
   return <View style={styles.container}>{props.children}</View>;
 };

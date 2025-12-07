@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('recipes', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->timestamps();
             $table->string('name');
             $table->string('image');
-            $table->uuid('id_recipe_category');
+            $table->bigInteger('id_recipe_category');
             $table->string('diet')->check("diet IN ('vegetarian', 'vegan')")->nullable();
             $table->foreign('id_recipe_category')->references('id')->on('recipe_categories');
             $table->integer('difficulty');
