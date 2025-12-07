@@ -5,7 +5,15 @@ import * as SecureStore from "expo-secure-store";
 const RECIPE_KEY = "filter_recipe";
 
 export default function useFilterRecipe() {
-  const [filterRecipe, setFilterRecipe] = useState(null);
+  const [filterRecipe, setFilterRecipe] = useState(JSON.stringify({
+    difficulties: [], // number[]
+    ingredients: [], // string[]
+    ingredient_categories: [], // string[]
+    utensils: [], // string[]
+    diet: "", // "vegan" | "vegetarian" | ""
+    time: 30, // minutes
+    type: "Breakfast"
+  }));
 
   // Load token on mount
   useEffect(() => {

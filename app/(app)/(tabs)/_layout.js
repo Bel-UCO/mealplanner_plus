@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import Header from "../../../component/header";
-import { Image } from "react-native";
+import { Image, View } from "react-native";
 
 export default function Layout() {
   return (
@@ -21,7 +21,12 @@ export default function Layout() {
         name="index"
         options={{
           tabBarIcon: () => (
-            <Image source={require("../../../resource/randomize.png")} />
+            <View style={{ paddingTop: 10 }}>
+              <Image
+                source={require("../../../resource/randomize.png")}
+                style={{ width: 30, height: 30 }}
+              />
+            </View>
           ),
           tabBarLabel: () => null,
           header: () => <Header />,
@@ -32,7 +37,12 @@ export default function Layout() {
         name="explore"
         options={{
           tabBarIcon: () => (
-            <Image source={require("../../../resource/explore.png")} />
+            <View style={{ paddingTop: 10 }}>
+              <Image
+                source={require("../../../resource/explore.png")}
+                style={{ width: 30, height: 30 }}
+              />
+            </View>
           ),
           tabBarLabel: () => null,
           header: () => <Header />,
@@ -43,7 +53,12 @@ export default function Layout() {
         name="profile"
         options={{
           tabBarIcon: () => (
-            <Image source={require("../../../resource/profile.png")} />
+            <View style={{ paddingTop: 10 }}>
+              <Image
+                source={require("../../../resource/profile.png")}
+                style={{ width: 30, height: 30 }}
+              />
+            </View>
           ),
           tabBarLabel: () => null,
           header: () => <Header />,
@@ -54,7 +69,7 @@ export default function Layout() {
       <Tabs.Screen
         name="recipe/[id]"
         options={{
-          href: null,            // ← hides it from the tab bar / sitemap
+          href: null,
           headerTitle: "Recipe Detail",
         }}
       />

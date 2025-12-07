@@ -4,25 +4,21 @@ import api, { API_BASE_URL } from "../../../util/api";
 import Menu from "../../../component/menu";
 import { FlatList } from "react-native";
 import { useRouter } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
 import useFilterRecipe from "../../../util/filterHooks";
 
 export default function Home() {
   const [data, setData] = useState([]);
-  const {filterRecipe} = useFilterRecipe()
+  const { filterRecipe } = useFilterRecipe();
   const router = useRouter();
 
-  useEffect(()=>{
-    fetchData()
-  },[filterRecipe])
+  useEffect(() => {
+    fetchData();
+  }, [filterRecipe]);
 
   const fetchData = async () => {
+
     const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: {
-        time: 30,
-        recipe_category: "Breakfast",
-      },
+      params: JSON.parse(filterRecipe),
     });
 
     setData(res.data); // make sure this is an array
