@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
-            $table->bigInteger('id_ingredient_category');
+            $table->bigInteger('id_ingredient_category')->nullable();
             $table->foreign('id_ingredient_category')->references('id')->on('ingredients_categories');
         });
     }
