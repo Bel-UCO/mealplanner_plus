@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\IngredientsController;
 use App\Http\Controllers\RandomizerController;
 use App\Models\Recipe;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,7 @@ Route::get('/', function () {
 });
 
 Route::get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);
+Route::get('/ingredient', [IngredientsController::class, 'getList']);
 Route::middleware('auth:sanctum')->get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);
 Route::middleware('auth:sanctum')->get('/get-preferences', [UserPreferencesController::class, 'getPreferences']);
 Route::middleware('auth:sanctum')->post('/set-preferences', [UserPreferencesController::class, 'updatePreferences']);

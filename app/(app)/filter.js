@@ -9,16 +9,44 @@ import {
   Image,
 } from "react-native";
 import useFilterRecipe from "../../util/filterHooks";
+import AutoComplete from "../../component/autocomplete";
 
 const ORANGE = "#FB9637";
 
 const Filter = () => {
   const router = useRouter();
-  const { filterRecipe,saveFilterRecipe } = useFilterRecipe();
+  const { filterRecipe, saveFilterRecipe } = useFilterRecipe();
 
   const [filterObject, setFilterObject] = useState(JSON.parse(filterRecipe));
 
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
+
+  const categoryIconList = [
+    { id: 1, icon: require("../../resource/Meat.png") },
+    { id: 2, icon: require("../../resource/Chicken.png") },
+    { id: 3, icon: require("../../resource/Seafood.png") },
+    { id: 4, icon: require("../../resource/Processed_meat.png") },
+    { id: 5, icon: require("../../resource/Egg.png") },
+    { id: 6, icon: require("../../resource/Grain.png") },
+    { id: 7, icon: require("../../resource/Vegetable.png") },
+    { id: 8, icon: require("../../resource/Fruit.png") },
+    { id: 9, icon: require("../../resource/Root.png") },
+    { id: 10, icon: require("../../resource/Peanut.png") },
+    { id: 11, icon: require("../../resource/Flour.png") },
+    { id: 12, icon: require("../../resource/Processed_food.png") },
+    { id: 13, icon: require("../../resource/Milk.png") },
+    { id: 14, icon: require("../../resource/Alcohol.png") },
+  ];
+
+  const utensilIconList = [
+    { id: 1, icon: require("../../resource/Blender.png") },
+    { id: 2, icon: require("../../resource/Chopper.png") },
+    { id: 3, icon: require("../../resource/Mixer.png") },
+    { id: 4, icon: require("../../resource/Microwave.png") },
+    { id: 5, icon: require("../../resource/Oven.png") },
+    { id: 6, icon: require("../../resource/Grinder.png") },
+    { id: 7, icon: require("../../resource/Shaker.png") },
+  ];
 
   // ---- handlers ----
   const toggleDifficulty = (value) => {
@@ -74,19 +102,38 @@ const Filter = () => {
     });
   };
 
-  const toggleIngredientMelon = () => {
-    setFilterObject((prev) => {
-      const exists = prev.ingredients.includes("melon");
-      const ingredients = exists
-        ? prev.ingredients.filter((i) => i !== "melon")
-        : [...prev.ingredients, "melon"];
-      return { ...prev, ingredients };
-    });
-  };
-
   const applyFilter = () => {
     saveFilterRecipe(filterObject);
     router.back();
+  };
+
+  const CategoryFilterButtonTemplate = ({ id, icon }) => {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.squareButton,
+          filterObject.ingredient_categories.includes(id) &&
+            styles.squareButtonActive,
+        ]}
+        onPress={() => toggleCategory(id)}
+      >
+        <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
+      </TouchableOpacity>
+    );
+  };
+
+  const UtensilFilterButtonTemplate = ({ id, icon }) => {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.squareButton,
+          filterObject.utensils.includes(id) && styles.squareButtonActive,
+        ]}
+        onPress={() => toggleUtensil(id)}
+      >
+        <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -369,238 +416,38 @@ const Filter = () => {
         {/* CATEGORY */}
         <Text style={styles.sectionTitle}>CATEGORY</Text>
         <View style={styles.iconGrid}>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat1") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat1")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat2") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat2")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat3") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat3")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat4") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat4")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat5") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat5")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat6") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat6")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat7") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat7")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat8") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat8")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat9") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat9")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat10") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat10")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat11") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat11")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.ingredient_categories.includes("cat12") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleCategory("cat12")}
-          >
-            <Text style={styles.squareIconEmoji}>🍽</Text>
-          </TouchableOpacity>
+          {categoryIconList.map((element) => (
+            <CategoryFilterButtonTemplate
+              key={element.id}
+              id={element.id}
+              icon={element.icon}
+            />
+          ))}
         </View>
 
         {/* INGREDIENT */}
+        {/* INGREDIENT */}
         <Text style={styles.sectionTitle}>INGREDIENT</Text>
-        <View style={styles.ingredientWrapper}>
-          <TouchableOpacity
-            style={[
-              styles.ingredientPill,
-              filterObject.ingredients.includes("melon") &&
-                styles.ingredientPillActive,
-            ]}
-            onPress={toggleIngredientMelon}
-          >
-            <Text style={styles.ingredientText}>MELON</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.ingredientPlusCircle}
-            onPress={toggleIngredientMelon}
-          >
-            <Text style={styles.ingredientPlus}>+</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.dropdownArrow}>⌵</Text>
-        </View>
+        <AutoComplete
+          value={filterObject.ingredients}
+          onChange={(newVal) =>
+            setFilterObject((prev) => ({
+              ...prev,
+              ingredients: newVal, // now full ingredient objects
+            }))
+          }
+        />
 
         {/* UTENSIL */}
         <Text style={styles.sectionTitle}>UTENSIL</Text>
         <View style={styles.iconGrid}>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut1") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut1")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut2") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut2")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut3") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut3")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut4") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut4")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut5") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut5")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut6") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut6")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut7") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut7")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.utensils.includes("ut8") &&
-                styles.squareButtonActive,
-            ]}
-            onPress={() => toggleUtensil("ut8")}
-          >
-            <Text style={styles.squareIconEmoji}>🍴</Text>
-          </TouchableOpacity>
+          {utensilIconList.map((element) => (
+            <UtensilFilterButtonTemplate
+              key={element.id}
+              id={element.id}
+              icon={element.icon}
+            />
+          ))}
         </View>
 
         {/* APPLY */}
@@ -621,9 +468,8 @@ const styles = StyleSheet.create({
   scroll: {
     paddingTop: 36,
     paddingHorizontal: 18,
-    paddingBottom: 24,
+    paddingBottom: 160, // ⬅️ more space so "APPLY" is above system buttons
   },
-
   // header
   headerRow: {
     flexDirection: "row",
@@ -668,11 +514,11 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: 2,
     borderRadius: 6,
-    backgroundColor: "#FFFFFF", // inactive
+    backgroundColor: "#FFFFFF",
   },
 
   difficultyItemActive: {
-    backgroundColor: "#8C8C8C", // active
+    backgroundColor: "#8C8C8C",
   },
 
   checkbox: {
@@ -750,13 +596,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
-  // shared square buttons (TYPE, CATEGORY, UTENSIL)
-  // shared square buttons (TYPE, CATEGORY, UTENSIL)
+  // shared square buttons
   squareButton: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: "#FFFFFF", // inactive = white
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 8,
@@ -764,7 +609,7 @@ const styles = StyleSheet.create({
   },
 
   squareButtonActive: {
-    backgroundColor: "#8C8C8C", // active = grey
+    backgroundColor: "#8C8C8C",
   },
 
   typeIconImg: {
@@ -817,10 +662,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: "#FFFFFF", // inactive
+    backgroundColor: "#FFFFFF",
   },
   ingredientPillActive: {
-    backgroundColor: "#8C8C8C", // active
+    backgroundColor: "#8C8C8C",
   },
   ingredientText: {
     fontSize: 12,

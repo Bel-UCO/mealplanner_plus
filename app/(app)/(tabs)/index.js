@@ -8,21 +8,23 @@ import useFilterRecipe from "../../../util/filterHooks";
 
 export default function Home() {
   const [data, setData] = useState([]);
-  const { filterRecipe , triggerFilter } = useFilterRecipe();
+  const { filterRecipe } = useFilterRecipe();
   const router = useRouter();
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchData();
   }, [filterRecipe]);
 
   const fetchData = async () => {
-    
+    const filterParam = JSON.parse(filterRecipe);
+
+    filterParam.ingredients = filterParam.ingredients.map(
+      (element) => element.id
+    );
+
     const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: JSON.parse(filterRecipe),
+      params: filterParam,
     });
-
-    console.log(JSON.parse(filterRecipe));
-
 
     setData(res.data); // make sure this is an array
   };
