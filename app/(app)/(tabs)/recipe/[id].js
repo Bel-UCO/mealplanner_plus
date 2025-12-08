@@ -57,7 +57,7 @@ export default function RecipeDetail() {
 
   return (
     <AuthenticatedLayout>
-      <View>
+      <View style={styles.fullWidth}>
         <View style={styles.card}>
           {/* Top Image */}
           <Image source={{ uri: imageUrl }} style={styles.image} />
@@ -71,7 +71,9 @@ export default function RecipeDetail() {
                 {/* Tags Row (time, difficulty, diet) */}
                 <View style={styles.tagRow}>
                   <Text style={styles.tag}>⏱ {recipe.time} min</Text>
-                  <Text style={styles.tag}>🔥 Difficulty {recipe.difficulty}</Text>
+                  <Text style={styles.tag}>
+                    🔥 Difficulty {recipe.difficulty}
+                  </Text>
                   <Text style={styles.tag}>🥦 {recipe.diet}</Text>
                 </View>
               </View>
@@ -122,6 +124,10 @@ export default function RecipeDetail() {
 }
 
 const styles = StyleSheet.create({
+  fullWidth: {
+    flex: 1,
+    width: "100%",
+  },
   card: {
     flex: 1,
     backgroundColor: "#fff",

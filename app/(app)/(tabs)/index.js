@@ -32,6 +32,7 @@ export default function Home() {
   return (
     <AuthenticatedLayout>
       <FlatList
+        style={{ flex: 1, width: "96%" }}
         data={data}
         keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
         renderItem={({ item }) => (

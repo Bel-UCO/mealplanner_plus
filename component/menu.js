@@ -6,7 +6,7 @@ const Menu = ({ title, image, onPress }) => {
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.cardContainer}
-      onPress={onPress}        // ← THIS WAS MISSING
+      onPress={onPress}
     >
       <View style={styles.card}>
         <Image
@@ -32,6 +32,7 @@ const Menu = ({ title, image, onPress }) => {
 const styles = StyleSheet.create({
   cardContainer: {
     margin: 8,
+    width:"100%"
   },
   card: {
     borderRadius: 10,
