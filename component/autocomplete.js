@@ -19,7 +19,7 @@ export default function AutoComplete({ value = [], onChange }) {
   // Fetch full ingredient objects
   useEffect(() => {
     if (!search.trim()) {
-      setOptions([]);
+      // 👇 keep old options; just don't fetch when empty
       return;
     }
 
@@ -33,9 +33,7 @@ export default function AutoComplete({ value = [], onChange }) {
         );
 
         const json = await res.json();
-
-        // store full objects
-        setOptions(json);
+        setOptions(json); // full objects
       } catch (err) {
         console.log("ingredient fetch error", err);
       }
@@ -48,13 +46,12 @@ export default function AutoComplete({ value = [], onChange }) {
   }, [search]);
 
   const handleSelect = (item) => {
-    // Only add if not already selected
     if (!value.find((v) => v.id === item.id)) {
       const newSelected = [...value, item];
       onChange && onChange(newSelected);
     }
-    setSearch("");
-    setOpen(false);
+    // keep dropdown open for multi-select
+    setSearch(""); // clear search text
   };
 
   const handleRemove = (removedItem) => {
@@ -62,7 +59,6 @@ export default function AutoComplete({ value = [], onChange }) {
     onChange && onChange(newSelected);
   };
 
-  // Filter by object.name
   const filtered = options.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -78,11 +74,9 @@ export default function AutoComplete({ value = [], onChange }) {
           <Text style={styles.plusText}>+</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.inputArea}
-          onPress={() => setOpen(!open)}
-        >
-          {value.length > 0 ? (
+        <View style={styles.inputArea}>
+          {/* Chips always visible */}
+          {value.length > 0 && (
             <View style={styles.chipContainer}>
               {value.map((item) => (
                 <View key={item.id} style={styles.chip}>
@@ -93,19 +87,20 @@ export default function AutoComplete({ value = [], onChange }) {
                 </View>
               ))}
             </View>
-          ) : (
-            <TextInput
-              placeholder="Search ingredient..."
-              value={search}
-              onChangeText={(t) => {
-                setSearch(t);
-                if (!open) setOpen(true);
-              }}
-              style={styles.input}
-              placeholderTextColor="#aaa"
-            />
           )}
-        </TouchableOpacity>
+
+          {/* Search input always available */}
+          <TextInput
+            placeholder="Search ingredient..."
+            value={search}
+            onChangeText={(t) => {
+              setSearch(t);
+              if (!open) setOpen(true);
+            }}
+            style={styles.input}
+            placeholderTextColor="#aaa"
+          />
+        </View>
 
         <TouchableOpacity onPress={() => setOpen(!open)}>
           <Text style={styles.arrow}>{open ? "▲" : "▼"}</Text>
@@ -115,18 +110,17 @@ export default function AutoComplete({ value = [], onChange }) {
       {/* Dropdown */}
       {open && (
         <View style={styles.dropdown}>
-          {value.length === 0 && (
-            <TextInput
-              autoFocus
-              placeholder="Search ingredient..."
-              value={search}
-              onChangeText={setSearch}
-              style={styles.searchBar}
-              placeholderTextColor="#aaa"
-            />
-          )}
+          {/* Optional: separate search bar inside dropdown (can be removed) */}
+          {/* 
+          <TextInput
+            placeholder="Search ingredient..."
+            value={search}
+            onChangeText={setSearch}
+            style={styles.searchBar}
+            placeholderTextColor="#aaa"
+          />
+          */}
 
-          {/* 🔁 Use ScrollView instead of FlatList */}
           <ScrollView
             style={{ maxHeight: 180 }}
             keyboardShouldPersistTaps="handled"
@@ -140,6 +134,12 @@ export default function AutoComplete({ value = [], onChange }) {
                 <Text style={styles.itemText}>{item.name}</Text>
               </TouchableOpacity>
             ))}
+
+            {filtered.length === 0 && !!search && (
+              <View style={styles.item}>
+                <Text style={styles.itemText}>No results</Text>
+              </View>
+            )}
           </ScrollView>
         </View>
       )}

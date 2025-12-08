@@ -107,6 +107,14 @@ const Filter = () => {
     router.back();
   };
 
+  const chunkArray = (array, size) => {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) {
+      result.push(array.slice(i, i + size));
+    }
+    return result;
+  };
+
   const CategoryFilterButtonTemplate = ({ id, icon }) => {
     return (
       <TouchableOpacity
@@ -316,7 +324,7 @@ const Filter = () => {
         </View>
 
         {/* TYPE */}
-        <Text style={styles.sectionTitle}>TYPE</Text>
+        {/* <Text style={styles.sectionTitle}>TYPE</Text>
         <View style={styles.typeRow}>
           <TouchableOpacity
             style={[
@@ -387,7 +395,7 @@ const Filter = () => {
               resizeMode="contain"
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* DIET */}
         <Text style={styles.sectionTitle}>DIET</Text>
@@ -416,16 +424,19 @@ const Filter = () => {
         {/* CATEGORY */}
         <Text style={styles.sectionTitle}>CATEGORY</Text>
         <View style={styles.iconGrid}>
-          {categoryIconList.map((element) => (
-            <CategoryFilterButtonTemplate
-              key={element.id}
-              id={element.id}
-              icon={element.icon}
-            />
+          {chunkArray(categoryIconList, 5).map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.iconRow}>
+              {row.map((element) => (
+                <CategoryFilterButtonTemplate
+                  key={element.id}
+                  id={element.id}
+                  icon={element.icon}
+                />
+              ))}
+            </View>
           ))}
         </View>
 
-        {/* INGREDIENT */}
         {/* INGREDIENT */}
         <Text style={styles.sectionTitle}>INGREDIENT</Text>
         <AutoComplete
@@ -441,12 +452,16 @@ const Filter = () => {
         {/* UTENSIL */}
         <Text style={styles.sectionTitle}>UTENSIL</Text>
         <View style={styles.iconGrid}>
-          {utensilIconList.map((element) => (
-            <UtensilFilterButtonTemplate
-              key={element.id}
-              id={element.id}
-              icon={element.icon}
-            />
+          {chunkArray(utensilIconList, 5).map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.iconRow}>
+              {row.map((element) => (
+                <UtensilFilterButtonTemplate
+                  key={element.id}
+                  id={element.id}
+                  icon={element.icon}
+                />
+              ))}
+            </View>
           ))}
         </View>
 
@@ -646,6 +661,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     marginTop: 4,
+  },
+
+  iconRow: {
+    flexDirection: "row",
+    marginBottom: 8,
   },
 
   // ingredient row
