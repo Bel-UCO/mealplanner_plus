@@ -11,9 +11,9 @@ import {
 } from "react-native";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
-import useFilterRecipe from "../../../util/filterHooks";
-import api, { API_BASE_URL } from "../../../util/api";
+import AuthenticatedLayout from "../../../../layout/AuthenticatedLayout";
+import useFilterRecipe from "../../../../util/filterHooks";
+import api, { API_BASE_URL } from "../../../../util/api";
 
 const ORANGE = "#ff9a20";
 

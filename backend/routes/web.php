@@ -31,6 +31,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/recipe', [RecipeController::class, 'getAll']);
 Route::get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);
 Route::get('/ingredient', [IngredientsController::class, 'getList']);
 Route::middleware('auth:sanctum')->get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);
