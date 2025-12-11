@@ -74,7 +74,7 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-        name="savedrecipe/[id]"
+        name="savedrecipe/list"
         options={{
           href: null,
           headerTitle: "Saved Recipe",

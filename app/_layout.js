@@ -15,10 +15,8 @@ export default function RootLayout() {
     const inAppGroup = segments[0] === "(app)";
 
     if (token && !inAppGroup) {
-      // Logged in but not in app stack → send to tabs
       router.replace("/(app)/(tabs)");
     } else if (!token && inAppGroup) {
-      // Not logged in but in app stack → send to login
       router.replace("/");
     }
   }, [token, loading, segments]);

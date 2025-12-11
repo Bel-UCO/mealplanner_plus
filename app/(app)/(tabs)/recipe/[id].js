@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import AuthenticatedLayout from "../../../../layout/AuthenticatedLayout";
@@ -22,6 +23,7 @@ export default function RecipeDetail() {
 
   const loadRecipe = async () => {
     try {
+      setLoading(true);
       const res = await api.get(`${API_BASE_URL}/recipe-detail/${id}`);
       setRecipe(res.data);
     } catch (err) {
@@ -30,6 +32,18 @@ export default function RecipeDetail() {
       setLoading(false);
     }
   };
+
+  const saveRecipe = async ()=>{
+    try {
+      setLoading(true);
+      const res = await api.post(`${API_BASE_URL}/save-recipe/${id}`);
+      console.log(res)
+    } catch (err) {
+      console.log("ERROR FETCHING RECIPE:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -80,7 +94,13 @@ export default function RecipeDetail() {
 
               {/* Icons: heart + share (mock) */}
               <View style={styles.iconGroup}>
-                <Text style={styles.icon}>♡</Text>
+                <TouchableOpacity style={styles.icon} onPress={()=>{
+                  saveRecipe()
+                }}>
+                  <Image
+                    source={require("../../../../resource/Save.png")}
+                  ></Image>
+                </TouchableOpacity>
                 <Text style={styles.icon}>↗</Text>
               </View>
             </View>

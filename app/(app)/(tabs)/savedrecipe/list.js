@@ -32,11 +32,11 @@ export default function Explore() {
       (element) => element.id
     );
 
-    const res = await api.get(`${API_BASE_URL}/recipe`, {
+    const res = await api.get(`${API_BASE_URL}/saved-recipe`, {
       params: filterParam,
     });
-
-    setData(res.data); // make sure this is an array
+      
+    setData(res?.data?.data); // make sure this is an array
   };
 
   const renderRecipe = ({ item }) => {
@@ -46,7 +46,7 @@ export default function Explore() {
           source={{
             uri:
               "https://xsaajlpecgffmsbllgby.supabase.co/storage/v1/object/public/mealplanner/" +
-              item.image,
+              item.belongs_to_recipe.image,
           }}
           style={styles.cardImage}
           imageStyle={styles.cardImageBorder}
@@ -59,7 +59,7 @@ export default function Explore() {
           </View>
 
           <View style={styles.recipeNameBar}>
-            <Text style={styles.recipeNameText}>{item.name}</Text>
+            <Text style={styles.recipeNameText}>{item.belongs_to_recipe.name}</Text>
           </View>
         </ImageBackground>
       </TouchableOpacity>
@@ -84,11 +84,6 @@ export default function Explore() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#222",
-  },
-
   header: {
     backgroundColor: ORANGE,
     height: 60,
@@ -112,6 +107,7 @@ const styles = StyleSheet.create({
 
   contentWrapper: {
     flex: 1,
+    width:"100%",
     backgroundColor: "white",
   },
 

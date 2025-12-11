@@ -1,12 +1,14 @@
 // ProfileButtonsScreen.js
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/Feather";        // for user & heart
+import Icon from "react-native-vector-icons/Feather"; // for user & heart
 import MaterialIcon from "react-native-vector-icons/MaterialIcons"; // for logout
 import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
+import { useRouter } from "expo-router";
 
 const ProfileButtonsScreen = () => {
   const email = "KENNY******@gmail.com";
+  const router = useRouter();
 
   return (
     <AuthenticatedLayout>
@@ -20,7 +22,14 @@ const ProfileButtonsScreen = () => {
         <View style={styles.separator} />
 
         {/* Saved recipe row */}
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity
+          style={styles.row}
+          onPress={() =>
+            router.push({
+              pathname: "/savedrecipe/list",
+            })
+          }
+        >
           <Text style={styles.rowText}>SAVED RECIPE</Text>
           <Icon name="heart" size={24} />
         </TouchableOpacity>
@@ -43,10 +52,10 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: "#fff",
-    width:"100%"
+    width: "100%",
   },
   listContainer: {
-    borderWidth: 1,           // thin outer border
+    borderWidth: 1, // thin outer border
     borderColor: "#000",
   },
   row: {
@@ -61,7 +70,7 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   separator: {
-    height: 1,                // thin line between rows
+    height: 1, // thin line between rows
     backgroundColor: "#000",
   },
 });
