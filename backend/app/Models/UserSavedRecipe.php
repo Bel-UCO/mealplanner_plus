@@ -13,7 +13,7 @@ class UserSavedRecipe extends Model
         return $this->belongsTo(User::class, 'id_user');
     }
 
-    public function hasRecipe() {
-        return $this->hasOne(Recipe::class, 'id', 'id_recipe');
+    public function belongsToRecipe() {
+        return $this->belongsTo(Recipe::class, 'id_recipe');
     }
 }
