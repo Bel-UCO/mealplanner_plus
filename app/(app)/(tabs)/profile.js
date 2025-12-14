@@ -1,12 +1,15 @@
 // ProfileButtonsScreen.js
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/Feather"; // for user & heart
-import MaterialIcon from "react-native-vector-icons/MaterialIcons"; // for logout
+import Icon from "react-native-vector-icons/Feather";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
 import { useRouter } from "expo-router";
+import useToken from "../../../util/useToken";
 
 const ProfileButtonsScreen = () => {
+  const { clearToken } = useToken();
+
   const email = "KENNY******@gmail.com";
   const router = useRouter();
 
@@ -37,7 +40,12 @@ const ProfileButtonsScreen = () => {
         <View style={styles.separator} />
 
         {/* Logout row */}
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity
+          style={styles.row}
+          onPress={async () => {
+            await clearToken();
+          }}
+        >
           <Text style={styles.rowText}>LOGOUT</Text>
           <MaterialIcon name="logout" size={24} />
         </TouchableOpacity>

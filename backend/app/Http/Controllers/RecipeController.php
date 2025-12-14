@@ -16,17 +16,17 @@ class RecipeController extends Controller
 
     public function buildQueryIngredientCategory($query, $ingredientCategories)
     {
-        return $query->whereIn('id', $ingredientCategories);
+        return $query->whereIn('id', $ingredientCategories)->orWhere("name","ILIKE","%".request("keyword")."%");
     }
 
     public function buildQueryIngredient($query, $ingredients)
     {
-        return $query->whereIn('id', $ingredients);
+        return $query->whereIn('id', $ingredients)->orWhere("name","ILIKE","%".request("keyword")."%");
     }
 
     public function buildQueryUtensil($query, $utensils)
     {
-        return $query->whereIn('id', $utensils);
+        return $query->whereIn('id', $utensils)->orWhere("name","ILIKE","%".request("keyword")."%");
     }
 
     public function getAll(Request $request)

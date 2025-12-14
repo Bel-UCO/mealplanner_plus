@@ -8,16 +8,17 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import useFilterRecipe from "../../util/filterHooks";
 import AutoComplete from "../../component/autocomplete";
+import useFilterRecipeSaved from "../../util/filterHooksSaved";
 
 const ORANGE = "#FB9637";
 
-const Filter = () => {
+const FilterExplore = () => {
   const router = useRouter();
-  const { filterRecipe, saveFilterRecipe } = useFilterRecipe();
+  const { filterRecipeSaved, saveFilterRecipeSaved } = useFilterRecipeSaved();
 
-  const [filterObject, setFilterObject] = useState(JSON.parse(filterRecipe));
+  const [filterObject, setFilterObject] = useState(filterRecipeSaved);
+
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
 
   const categoryIconList = [
@@ -47,13 +48,6 @@ const Filter = () => {
     { id: 7, icon: require("../../resource/Shaker.png") },
   ];
 
-  const handleSearchByPress = (value) => {
-    setFilterObject((prev) => ({
-      ...prev,
-      search_by: value,
-    }));
-  };
-
   const toggleDifficulty = (value) => {
     setFilterObject((prev) => {
       const exists = prev.difficulties.includes(value);
@@ -80,6 +74,13 @@ const Filter = () => {
     }));
   };
 
+  const handleTypePress = (typeValue) => {
+    setFilterObject((prev) => ({
+      ...prev,
+      type: prev.type === typeValue ? "" : typeValue,
+    }));
+  };
+
   const toggleCategory = (id) => {
     setFilterObject((prev) => {
       const exists = prev.ingredient_categories.includes(id);
@@ -101,12 +102,7 @@ const Filter = () => {
   };
 
   const applyFilter = () => {
-    const payload = {
-      ...filterObject,
-      search_by: filterObject.search_by || "explore",
-    };
-
-    saveFilterRecipe(payload);
+    saveFilterRecipeSaved(filterObject);
     router.back();
   };
 
@@ -152,40 +148,16 @@ const Filter = () => {
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* HEADER */}
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity
+            onPress={() => {
+              applyFilter();
+            }}
+          >
             <Text style={styles.backArrow}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>FILTER</Text>
         </View>
         <View style={styles.divider} />
-
-        {/* ✅ SEARCH BY */}
-        <Text style={styles.sectionTitle}>SEARCH BY</Text>
-        <View style={styles.searchByRow}>
-          <TouchableOpacity
-            style={styles.searchByItem}
-            onPress={() => handleSearchByPress("explore")}
-          >
-            <View style={styles.radioOuter}>
-              {filterObject.search_by === "explore" && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.searchByText}>EXPLORE</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.searchByItem}
-            onPress={() => handleSearchByPress("saved")}
-          >
-            <View style={styles.radioOuter}>
-              {filterObject.search_by === "saved" && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.searchByText}>SAVED</Text>
-          </TouchableOpacity>
-        </View>
 
         {/* DIFFICULTIES */}
         <Text style={styles.sectionTitle}>DIFFICULTIES</Text>
@@ -275,6 +247,8 @@ const Filter = () => {
             <Text style={styles.difficultyText}>5</Text>
           </TouchableOpacity>
         </View>
+
+        {/* TIME */}
         <Text style={styles.sectionTitle}>TIME</Text>
         <View style={styles.sliderContainer}>
           <View style={styles.sliderWrapper}>
@@ -342,6 +316,7 @@ const Filter = () => {
               </TouchableOpacity>
             </View>
           </View>
+
           <View style={styles.timeLabelRow}>
             <Text style={styles.timeLabel}>30 M</Text>
             <Text style={styles.timeLabel}>1 H</Text>
@@ -350,6 +325,82 @@ const Filter = () => {
             <Text style={styles.timeLabel}>4 H+</Text>
           </View>
         </View>
+
+        {/* TYPE */}
+        <Text style={styles.sectionTitle}>TYPE</Text>
+        <View style={styles.typeRow}>
+          <TouchableOpacity
+            style={[
+              styles.squareButton,
+              filterObject.type === "Breakfast" && styles.squareButtonActive,
+            ]}
+            onPress={() => handleTypePress("Breakfast")}
+          >
+            <Image
+              source={require("../../resource/Breakfast.png")}
+              style={styles.typeIconImg}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.squareButton,
+              filterObject.type === "Lunch" && styles.squareButtonActive,
+            ]}
+            onPress={() => handleTypePress("Lunch")}
+          >
+            <Image
+              source={require("../../resource/Lunch.png")}
+              style={styles.typeIconImg}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.squareButton,
+              filterObject.type === "Dinner" && styles.squareButtonActive,
+            ]}
+            onPress={() => handleTypePress("Dinner")}
+          >
+            <Image
+              source={require("../../resource/Dinner.png")}
+              style={styles.typeIconImg}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.squareButton,
+              filterObject.type === "Dessert" && styles.squareButtonActive,
+            ]}
+            onPress={() => handleTypePress("Dessert")}
+          >
+            <Image
+              source={require("../../resource/Dessert.png")}
+              style={styles.typeIconImg}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.squareButton,
+              filterObject.type === "Drink" && styles.squareButtonActive,
+            ]}
+            onPress={() => handleTypePress("Drink")}
+          >
+            <Image
+              source={require("../../resource/Drink.png")}
+              style={styles.typeIconImg}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* DIET */}
         <Text style={styles.sectionTitle}>DIET</Text>
         <View style={styles.chipRow}>
           <TouchableOpacity
@@ -372,6 +423,8 @@ const Filter = () => {
             <Text style={styles.chipText}>VEGETARIAN</Text>
           </TouchableOpacity>
         </View>
+
+        {/* CATEGORY */}
         <Text style={styles.sectionTitle}>CATEGORY</Text>
         <View style={styles.iconGrid}>
           {chunkArray(categoryIconList, 5).map((row, rowIndex) => (
@@ -394,10 +447,12 @@ const Filter = () => {
           onChange={(newVal) =>
             setFilterObject((prev) => ({
               ...prev,
-              ingredients: newVal,
+              ingredients: newVal, // now full ingredient objects
             }))
           }
         />
+
+        {/* UTENSIL */}
         <Text style={styles.sectionTitle}>UTENSIL</Text>
         <View style={styles.iconGrid}>
           {chunkArray(utensilIconList, 5).map((row, rowIndex) => (
@@ -412,51 +467,45 @@ const Filter = () => {
             </View>
           ))}
         </View>
-        <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
-          <Text style={styles.applyText}>APPLY</Text>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  
+  // layout
   container: {
     flex: 1,
     backgroundColor: ORANGE,
   },
-  
   scroll: {
     paddingTop: 36,
     paddingHorizontal: 18,
-    paddingBottom: 160,
+    paddingBottom: 160, // ⬅️ more space so "APPLY" is above system buttons
   },
-  
+  // header
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
   },
-  
   backArrow: {
     fontSize: 22,
     marginRight: 12,
     color: "#000",
   },
-  
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#000",
   },
-  
   divider: {
     height: 1,
     backgroundColor: "#000",
     marginBottom: 16,
   },
-  
+
+  // section titles
   sectionTitle: {
     marginTop: 10,
     marginBottom: 6,
@@ -464,48 +513,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
   },
-  
-  searchByRow: {
-    flexDirection: "row",
-    marginBottom: 8,
-  },
-  
-  searchByItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 18,
-  },
-  
-  radioOuter: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 1,
-    borderColor: "#000",
-    backgroundColor: "#FFF",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 6,
-  },
-  
-  radioInner: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#000",
-  },
-  
-  searchByText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  
+
+  // difficulties
   difficultyRow: {
     flexDirection: "row",
     marginBottom: 4,
   },
-  
+
   difficultyItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -529,31 +543,27 @@ const styles = StyleSheet.create({
     marginRight: 6,
     backgroundColor: "#FFFFFF",
   },
-  
   checkboxActive: {
     backgroundColor: "#000000",
   },
-  
   difficultyText: {
     fontSize: 12,
     color: "#000",
   },
-  
+
+  // time slider
   sliderContainer: {
     marginTop: 4,
   },
-  
   sliderWrapper: {
     height: 18,
     justifyContent: "center",
   },
-  
   sliderTrack: {
     height: 3,
     borderRadius: 2,
     backgroundColor: "#FFF",
   },
-  
   sliderDotsRow: {
     position: "absolute",
     left: 0,
@@ -563,7 +573,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
     alignItems: "center",
   },
-  
   sliderDotOuter: {
     width: 12,
     height: 12,
@@ -574,35 +583,33 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  
   sliderDotOuterActive: {
     borderColor: "#1BA1FF",
   },
-  
   sliderDotInner: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: "#1BA1FF",
   },
-  
   timeLabelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 4,
   },
-  
   timeLabel: {
     fontSize: 10,
     color: "#000",
   },
-  
+
+  // TYPE layout row
   typeRow: {
     flexDirection: "row",
     marginTop: 4,
     marginBottom: 4,
   },
-  
+
+  // shared square buttons
   squareButton: {
     width: 44,
     height: 44,
@@ -622,16 +629,15 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
   },
-  
   squareIconEmoji: {
     fontSize: 18,
   },
-  
+
+  // diet chips
   chipRow: {
     flexDirection: "row",
     marginTop: 4,
   },
-  
   chip: {
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
@@ -639,17 +645,15 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 8,
   },
-  
   chipActive: {
     backgroundColor: "#A0A0A0",
   },
-  
   chipText: {
     fontSize: 12,
     fontWeight: "bold",
     color: "#000",
   },
-  
+
   iconGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -660,7 +664,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 8,
   },
-  
+
   ingredientWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -670,23 +674,23 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginTop: 4,
   },
-  
+
   ingredientPill: {
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 16,
     backgroundColor: "#FFFFFF",
   },
-  
+
   ingredientPillActive: {
     backgroundColor: "#8C8C8C",
   },
-  
+
   ingredientText: {
     fontSize: 12,
     color: "#000",
   },
-  
+
   ingredientPlusCircle: {
     width: 26,
     height: 26,
@@ -699,12 +703,12 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginRight: "auto",
   },
-  
+
   ingredientPlus: {
     fontSize: 16,
     color: "#000",
   },
-  
+
   dropdownArrow: {
     fontSize: 18,
     color: "#000",
@@ -720,7 +724,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: "center",
   },
-  
   applyText: {
     fontSize: 14,
     fontWeight: "bold",
@@ -728,4 +731,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Filter;
+export default FilterExplore;

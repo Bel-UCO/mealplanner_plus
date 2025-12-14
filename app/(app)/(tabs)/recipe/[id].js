@@ -33,17 +33,17 @@ export default function RecipeDetail() {
     }
   };
 
-  const saveRecipe = async ()=>{
+  const saveRecipe = async () => {
     try {
       setLoading(true);
       const res = await api.post(`${API_BASE_URL}/save-recipe/${id}`);
-      console.log(res)
+      console.log(res);
     } catch (err) {
       console.log("ERROR FETCHING RECIPE:", err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -73,16 +73,13 @@ export default function RecipeDetail() {
     <AuthenticatedLayout>
       <View style={styles.fullWidth}>
         <View style={styles.card}>
-          {/* Top Image */}
           <Image source={{ uri: imageUrl }} style={styles.image} />
 
           <ScrollView contentContainerStyle={styles.content}>
-            {/* Title + Icons */}
             <View style={styles.headerRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.title}>{recipe.name}</Text>
 
-                {/* Tags Row (time, difficulty, diet) */}
                 <View style={styles.tagRow}>
                   <Text style={styles.tag}>⏱ {recipe.time} min</Text>
                   <Text style={styles.tag}>
@@ -92,20 +89,30 @@ export default function RecipeDetail() {
                 </View>
               </View>
 
-              {/* Icons: heart + share (mock) */}
               <View style={styles.iconGroup}>
-                <TouchableOpacity style={styles.icon} onPress={()=>{
-                  saveRecipe()
-                }}>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => {
+                    saveRecipe();
+                  }}
+                >
                   <Image
                     source={require("../../../../resource/Save.png")}
                   ></Image>
                 </TouchableOpacity>
-                <Text style={styles.icon}>↗</Text>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => {
+                    saveRecipe();
+                  }}
+                >
+                  <Image
+                    source={require("../../../../resource/Share.png")}
+                  ></Image>
+                </TouchableOpacity>
               </View>
             </View>
 
-            {/* INGREDIENTS */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>INGREDIENT</Text>
               {recipe.has_many_recipe_ingredient.map((item) => (
@@ -115,7 +122,6 @@ export default function RecipeDetail() {
               ))}
             </View>
 
-            {/* SEASONING (may be empty array) */}
             {recipe.has_many_recipe_seasoning.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>SEASONING</Text>
@@ -127,7 +133,6 @@ export default function RecipeDetail() {
               </View>
             )}
 
-            {/* STEPS */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>STEPS</Text>
               {recipe.has_many_steps.map((step, index) => (

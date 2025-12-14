@@ -29,7 +29,7 @@ export default function Layout() {
             </View>
           ),
           tabBarLabel: () => null,
-          header: () => <Header />,
+          header: () => <Header headText="MEALPLANNER+" filterRoute="/filter"/>,
         }}
       />
 
@@ -45,7 +45,7 @@ export default function Layout() {
             </View>
           ),
           tabBarLabel: () => null,
-          header: () => <Header />,
+          header: () => <Header headText="EXPLORE" filterRoute="/filterexplore" />,
         }}
       />
 
@@ -61,7 +61,7 @@ export default function Layout() {
             </View>
           ),
           tabBarLabel: () => null,
-          header: () => <Header />,
+          header: () => <Header headText="SETTING"/>,
         }}
       />
 
@@ -78,6 +78,7 @@ export default function Layout() {
         options={{
           href: null,
           headerTitle: "Saved Recipe",
+          header: () => <Header headText="SAVED RECIPE" filterRoute="/filtersaved"/>,
         }}
       />
     </Tabs>

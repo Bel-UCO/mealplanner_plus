@@ -8,32 +8,43 @@ import {
   FlatList,
   ImageBackground,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
-import useFilterRecipe from "../../../util/filterHooks";
 import api, { API_BASE_URL } from "../../../util/api";
+import useFilterRecipeExplore from "../../../util/filterHooksExplore";
+import { useRouter } from "expo-router";
 
 const ORANGE = "#ff9a20";
 
 export default function Explore() {
   const [data, setData] = useState([]);
-  const { filterRecipe } = useFilterRecipe();
+  const { filterRecipeExplore } = useFilterRecipeExplore();
+  const router = useRouter();
+
+  const categoryIcons = {
+    Breakfast: require("../../../resource/Breakfast_Randomize.png"),
+    Lunch: require("../../../resource/Lunch_Randomize.png"),
+    Dinner: require("../../../resource/Dinner_Randomize.png"),
+    Dessert: require("../../../resource/Dessert_Randomize.png"),
+    Drink: require("../../../resource/Drink_Randomize.png"),
+  };
 
   useEffect(() => {
     fetchData();
-  }, [filterRecipe]);
+  }, [filterRecipeExplore]);
 
   const fetchData = async () => {
-    const filterParam = JSON.parse(filterRecipe);
+    const filterParam = { ...filterRecipeExplore };
 
     filterParam.ingredients = filterParam.ingredients.map(
       (element) => element.id
     );
 
     const res = await api.get(`${API_BASE_URL}/recipe`, {
-      params: filterParam,
+      params: filterRecipeExplore,
     });
 
     setData(res.data); // make sure this is an array
@@ -41,7 +52,16 @@ export default function Explore() {
 
   const renderRecipe = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.cardContainer} activeOpacity={0.85}>
+      <TouchableOpacity
+        style={styles.cardContainer}
+        activeOpacity={0.85}
+        onPress={() =>
+          router.push({
+            pathname: "/recipe/[id]",
+            params: { id: item.id },
+          })
+        }
+      >
         <ImageBackground
           source={{
             uri:
@@ -52,9 +72,11 @@ export default function Explore() {
           imageStyle={styles.cardImageBorder}
         >
           <View style={styles.cardTopRow}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="restaurant" size={14} />
-            </View>
+            <Image
+              source={categoryIcons[item?.belongs_to_recipe_category?.name]}
+              style={styles.categoryIcon}
+              resizeMode="contain"
+            />
             <Ionicons name="heart-outline" size={22} color="white" />
           </View>
 
@@ -118,6 +140,16 @@ const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: "space-between",
     marginBottom: 16,
+  },
+
+  categoryWrapper: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+  },
+  categoryIcon: {
+    width: 26,
+    height: 26,
   },
 
   cardContainer: {

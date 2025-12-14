@@ -8,6 +8,7 @@ import {
   FlatList,
   ImageBackground,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -20,6 +21,14 @@ const ORANGE = "#ff9a20";
 export default function Explore() {
   const [data, setData] = useState([]);
   const { filterRecipe } = useFilterRecipe();
+
+  const categoryIcons = {
+    Breakfast: require("../../../../resource/Breakfast_Randomize.png"),
+    Lunch: require("../../../../resource/Lunch_Randomize.png"),
+    Dinner: require("../../../../resource/Dinner_Randomize.png"),
+    Dessert: require("../../../../resource/Dessert_Randomize.png"),
+    Drink: require("../../../../resource/Drink_Randomize.png"),
+  };
 
   useEffect(() => {
     fetchData();
@@ -35,13 +44,22 @@ export default function Explore() {
     const res = await api.get(`${API_BASE_URL}/saved-recipe`, {
       params: filterParam,
     });
-      
-    setData(res?.data?.data); // make sure this is an array
+
+    setData(res?.data?.data);
   };
 
   const renderRecipe = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.cardContainer} activeOpacity={0.85}>
+      <TouchableOpacity
+        style={styles.cardContainer}
+        activeOpacity={0.85}
+        onPress={() =>
+          router.push({
+            pathname: "/recipe/[id]",
+            params: { id: item.id },
+          })
+        }
+      >
         <ImageBackground
           source={{
             uri:
@@ -52,14 +70,22 @@ export default function Explore() {
           imageStyle={styles.cardImageBorder}
         >
           <View style={styles.cardTopRow}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="restaurant" size={14} />
-            </View>
+            <Image
+              source={
+                categoryIcons[
+                  item?.belongs_to_recipe.belongs_to_recipe_category?.name
+                ]
+              }
+              style={styles.categoryIcon}
+              resizeMode="contain"
+            />
             <Ionicons name="heart-outline" size={22} color="white" />
           </View>
 
           <View style={styles.recipeNameBar}>
-            <Text style={styles.recipeNameText}>{item.belongs_to_recipe.name}</Text>
+            <Text style={styles.recipeNameText}>
+              {item.belongs_to_recipe.name}
+            </Text>
           </View>
         </ImageBackground>
       </TouchableOpacity>
@@ -84,6 +110,11 @@ export default function Explore() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#222",
+  },
+
   header: {
     backgroundColor: ORANGE,
     height: 60,
@@ -107,13 +138,24 @@ const styles = StyleSheet.create({
 
   contentWrapper: {
     flex: 1,
-    width:"100%",
+    width: "100%",
     backgroundColor: "white",
   },
 
   columnWrapper: {
     justifyContent: "space-between",
     marginBottom: 16,
+  },
+
+  categoryWrapper: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+  },
+  
+  categoryIcon: {
+    width: 26,
+    height: 26,
   },
 
   cardContainer: {

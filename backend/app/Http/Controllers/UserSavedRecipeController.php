@@ -16,20 +16,24 @@ class UserSavedRecipeController extends Controller
 
     public function buildQueryIngredientCategory($query, $ingredientCategories)
     {
-        return $query->whereIn('id', $ingredientCategories);
+        return $query->whereIn('id', $ingredientCategories)->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
     }
 
     public function buildQueryIngredient($query, $ingredients)
     {
-        return $query->whereIn('id', $ingredients);
+        return $query->whereIn('id', $ingredients)->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
     }
 
     public function buildQueryUtensil($query, $utensils)
     {
-        return $query->whereIn('id', $utensils);
+        return $query->whereIn('id', $utensils)->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
     }
 
-    public function randomizeMealPlan(Request $request)
+    public function getList(Request $request){
+        return $this->queryUserSavedRecipe($request)->paginate(10);
+    }
+
+    public function queryUserSavedRecipe(Request $request)
     {
         $difficulties = $request->input('difficulties', []);
         $ingredients  = $request->input('ingredients', []);
@@ -109,37 +113,37 @@ class UserSavedRecipeController extends Controller
             );
         }
 
-        $time = request("time");
+        $time = request('time');
 
-        $breakfasts = $breakfasts->whereHas(
-            'belongsToRecipe',
-            function ($q) use ($time) {
-                $queryHalfHour = clone $q;
+        if (!empty($time)) {
+            $time = (int) $time;
 
-                if ($queryHalfHour->where("time", "<=", $time)->count() == 0) {
-                    $queryOneHour = clone $q;
-                    if ($queryOneHour->where("time", "<=", 60)->count() == 0) {
-                        $queryTwoHour = clone $q;
-                        if ($queryTwoHour->where("time", "<=", 120)->count() == 0) {
-                            $queryFourHour = clone $q;
-                            if ($queryFourHour->where("time", "<=", 240)->count() == 0) {
-                                $q = $q;
-                            } else {
-                                $q = $q->where("time", "<=", 240);
-                            }
-                        } else {
-                            $q = $q->where("time", "<=", 120);
-                        }
-                    } else {
-                        $q = $q->where("time", "<=", 60);
-                    }
-                } else {
-                    $q = $q->where("time", "<=", $time);
+            // fallback levels
+            $levels = [$time, 60, 120, 240];
+
+            $selectedTime = null;
+
+            foreach ($levels as $t) {
+                $check = clone $breakfasts;
+                $check->whereHas('belongsToRecipe', function ($q) use ($t) {
+                    $q->where('time', '<=', $t);
+                });
+
+                if ($check->exists()) {
+                    $selectedTime = $t;
+                    break;
                 }
             }
-        );
 
-        return $breakfasts->paginate(10);
+            if ($selectedTime !== null) {
+                $breakfasts->whereHas('belongsToRecipe', function ($q) use ($selectedTime) {
+                    $q->where('time', '<=', $selectedTime);
+                });
+            }
+        }
+
+
+        return $breakfasts;
     }
 
     public function userSaveRecipe()

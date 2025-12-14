@@ -29,12 +29,24 @@ class RandomizerController extends Controller
 
     public function randomizeMealPlan(Request $request)
     {
+        if (request("search_by") === "explore") {
+
+            return $this->getRecipeFromDb($request)->inRandomOrder()->get();
+        } else {
+
+            $userSavedRecipeController = new UserSavedRecipeController;
+            return $userSavedRecipeController->queryUserSavedRecipe($request)->inRandomOrder()->get();
+        }
+    }
+
+    public function getRecipeFromDb(Request $request)
+    {
         $difficulties = $request->input('difficulties', []);
         $ingredients  = $request->input('ingredients', []);
         $ingredientCategories = $request->input('ingredient_categories', []);
         $utensils     = $request->input('utensils', []);
         $diet = request("diet");
-        
+
         if (is_string($ingredientCategories)) {
             $ingredientCategories = array_map('intval', explode(',', $ingredientCategories));
         }
@@ -104,7 +116,6 @@ class RandomizerController extends Controller
                     if ($queryFourHour->where("time", "<=", 240)->count() == 0) {
 
                         $breakfasts = $breakfasts;
-
                     } else {
                         $breakfasts = $breakfasts->where("time", "<=", 240);
                     }
@@ -118,7 +129,6 @@ class RandomizerController extends Controller
             $breakfasts = $breakfasts->where("time", "<=", request("time"));
         }
 
-        return $breakfasts->inRandomOrder()->get();
+        return $breakfasts;
     }
-
 }

@@ -26,6 +26,20 @@ export default function AppLayout() {
           title: "Filter",
         }}
       />
+
+      <Drawer.Screen
+        name="filterexplore"
+        options={{
+          title: "Filter Explore",
+        }}
+      />
+
+      <Drawer.Screen
+        name="filtersaved"
+        options={{
+          title: "Filter Explore",
+        }}
+      />
     </Drawer>
   );
 }
