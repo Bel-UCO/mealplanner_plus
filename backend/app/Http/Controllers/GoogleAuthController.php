@@ -27,14 +27,6 @@ class GoogleAuthController extends Controller
             ['email'     => $googleUser->getEmail()]
         );
 
-        $userPreferences = UserPreferences::firstOrCreate(
-            ['id_user' => $user->id],       // kondisi existing
-            [
-                'search_by' => 'explore',   // nilai default saat dibuat
-                'time'      => 30,
-            ]
-        );
-
         $token = $user->createToken('google_mobile')->plainTextToken;
 
         $redirectBack = $request->session()->pull(

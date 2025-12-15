@@ -37,7 +37,7 @@ export default function AppLayout() {
       <Drawer.Screen
         name="filtersaved"
         options={{
-          title: "Filter Explore",
+          title: "Filter Saved",
         }}
       />
     </Drawer>

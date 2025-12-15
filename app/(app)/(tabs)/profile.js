@@ -1,24 +1,35 @@
 // ProfileButtonsScreen.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
 import { useRouter } from "expo-router";
 import useToken from "../../../util/useToken";
+import api from "../../../util/api";
 
 const ProfileButtonsScreen = () => {
   const { clearToken } = useToken();
 
-  const email = "KENNY******@gmail.com";
+  const [user,setUser] = useState();
+
   const router = useRouter();
+
+  useEffect(()=>{
+    fetchData()
+  },[])
+
+  const fetchData = async () =>{
+    const res = await api.get("/user")
+    setUser(res.data)
+  }
 
   return (
     <AuthenticatedLayout>
       <View style={styles.screen}>
         {/* Email row */}
         <TouchableOpacity style={styles.row}>
-          <Text style={styles.rowText}>{email}</Text>
+          <Text style={styles.rowText}>{user?.email}</Text>
           <Icon name="user" size={22} />
         </TouchableOpacity>
 

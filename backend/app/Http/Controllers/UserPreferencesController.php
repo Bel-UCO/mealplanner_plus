@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\UserPreferences;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserPreferencesController extends Controller
 {
     private function joinOrNull($value): ?string
     {
-        // If frontend sends array => "a,b,c"
         if (is_array($value)) {
             $value = array_values(array_filter($value, fn ($v) => $v !== null && $v !== ''));
             return count($value) ? implode(',', $value) : null;
         }
 
-        // If frontend sends "" => null
         if (is_string($value)) {
             $trim = trim($value);
             return $trim === '' ? null : $trim;
@@ -26,8 +24,11 @@ class UserPreferencesController extends Controller
     }
     public function getPreferences(Request $request)
     {
-        $preferences = $request->user()->hasUserPreference;
-        return $preferences;
+
+        $user = Auth::user();
+        $userPreference = UserPreferences::where("id_user","=",$user->id)->first();
+
+        return $userPreference;
     }
 
     public function updatePreferences(Request $request)

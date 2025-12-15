@@ -11,14 +11,15 @@ const RECIPE_KEY = "LOCKED_RECIPES";
 
 export default function Home() {
   const [data, setData] = useState([]);
-  const { filterRecipe } = useFilterRecipe();
+  const { triggerFilterRecipeChange, filterRecipe } = useFilterRecipe();
   const router = useRouter();
 
-  useEffect(() => {
+  useEffect(() => {    
+    console.log("fetch random");
     fetchData();
-  }, [filterRecipe]);
+  }, [triggerFilterRecipeChange]);
 
-  const fetchData = async () => {
+  const fetchDataBreakfast = async () => {
     const filterParam = JSON.parse(filterRecipe);
     filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
 
@@ -26,11 +27,117 @@ export default function Home() {
     const lockedRecipes = stored ? JSON.parse(stored) : [];
 
     const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: filterParam,
-    });    
-    
-    setData([...res.data]);
-  
+      params: { ...filterParam, type: "Breakfast" },
+    });
+
+    return lockedRecipes[0]
+      ? lockedRecipes[0]
+      : res?.data[0]?.belongs_to_recipe
+      ? res.data[0].belongs_to_recipe
+      : res?.data[0];
+  };
+
+  const fetchDataLunch = async () => {
+    const filterParam = JSON.parse(filterRecipe);
+    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
+
+    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
+    const lockedRecipes = stored ? JSON.parse(stored) : [];
+
+    const res = await api.get(`${API_BASE_URL}/randomize`, {
+      params: { ...filterParam, type: "Lunch" },
+    });
+
+    return lockedRecipes[1] ? lockedRecipes[1] : res?.data[0];
+  };
+
+  const fetchDataDinner = async () => {
+    const filterParam = JSON.parse(filterRecipe);
+    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
+
+    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
+    const lockedRecipes = stored ? JSON.parse(stored) : [];
+
+    const res = await api.get(`${API_BASE_URL}/randomize`, {
+      params: { ...filterParam, type: "Dinner" },
+    });
+
+    return lockedRecipes[2]
+      ? lockedRecipes[2]
+      : res?.data[0]?.belongs_to_recipe
+      ? res.data[0].belongs_to_recipe
+      : res?.data[0];
+  };
+
+  const fetchDataDessert = async () => {
+    const filterParam = JSON.parse(filterRecipe);
+    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
+
+    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
+    const lockedRecipes = stored ? JSON.parse(stored) : [];
+
+    const res = await api.get(`${API_BASE_URL}/randomize`, {
+      params: { ...filterParam, type: "Dessert" },
+    });
+
+    return lockedRecipes[3]
+      ? lockedRecipes[3]
+      : res?.data[0]?.belongs_to_recipe
+      ? res.data[0].belongs_to_recipe
+      : res?.data[0];
+  };
+
+  const fetchDataDrink = async () => {
+    const filterParam = JSON.parse(filterRecipe);
+    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
+
+    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
+    const lockedRecipes = stored ? JSON.parse(stored) : [];
+
+    const res = await api.get(`${API_BASE_URL}/randomize`, {
+      params: { ...filterParam, type: "Drink" },
+    });
+
+    return lockedRecipes[4]
+      ? lockedRecipes[4]
+      : res?.data[0]?.belongs_to_recipe
+      ? res.data[0].belongs_to_recipe
+      : res?.data[0];
+  };
+
+  const fetchData = async () => {
+    const [resBreakfast, resLunch, resDinner, resDessert, resDrink] =
+      await Promise.all([
+        fetchDataBreakfast(),
+        fetchDataLunch(),
+        fetchDataDinner(),
+        fetchDataDessert(),
+        fetchDataDrink(),
+      ]);
+
+    const arrOfData = [];
+
+    if (resBreakfast) {
+      arrOfData.push(resBreakfast);
+    }
+
+    if (resLunch) {
+      arrOfData.push(resLunch);
+    }
+
+    if (resDinner) {
+      arrOfData.push(resDinner);
+    }
+
+    if (resDessert) {
+      arrOfData.push(resDessert);
+    }
+
+    if (resDrink) {
+      arrOfData.push(resDrink);
+    }
+
+    setData(arrOfData);
   };
 
   const lockRecipe = async (recipe) => {

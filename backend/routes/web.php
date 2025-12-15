@@ -3,10 +3,9 @@
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\IngredientsController;
 use App\Http\Controllers\RandomizerController;
-use App\Models\Recipe;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecipeController;
-use App\Models\UserPreferences;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\UserSavedRecipeController;
 
@@ -34,12 +33,11 @@ Route::get('/', function () {
 
 Route::get('/recipe', [RecipeController::class, 'getAll']);
 Route::get('/ingredient', [IngredientsController::class, 'getList']);
+Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:sanctum')->get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);
 Route::middleware('auth:sanctum')->get('/saved-recipe', [UserSavedRecipeController::class, 'getList']);
 Route::middleware('auth:sanctum')->post('/save-recipe/{id}', [UserSavedRecipeController::class, 'userSaveRecipe']);
 Route::middleware('auth:sanctum')->get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);
-Route::middleware('auth:sanctum')->get('/get-preferences', [UserPreferencesController::class, 'getPreferences']);
-Route::middleware('auth:sanctum')->post('/set-preferences', [UserPreferencesController::class, 'updatePreferences']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/preferences', [UserPreferencesController::class, 'getPreferences']);
     Route::post('/preferences', [UserPreferencesController::class, 'updatePreferences']);
