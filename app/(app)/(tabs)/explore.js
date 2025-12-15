@@ -45,9 +45,7 @@ export default function Explore() {
       params: filterParam,
     });
 
-
     setData(res.data); // make sure this is an array
-
   };
 
   const renderRecipe = ({ item }) => {
@@ -58,7 +56,7 @@ export default function Explore() {
         onPress={() =>
           router.push({
             pathname: "/recipe/[id]",
-            params: { id: item.id },
+            params: { id: item?.id },
           })
         }
       >

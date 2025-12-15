@@ -7,128 +7,163 @@ use Illuminate\Http\Request;
 
 class RecipeController extends Controller
 {
-    //
+    private function normalizeIds($value): array
+    {
+        if (is_array($value)) return array_map('intval', $value);
 
-    public function buildQueryDifficulties($query, $difficulties)
+        if (is_string($value) && trim($value) !== '') {
+            return array_map('intval', array_filter(explode(',', $value), fn($v) => trim($v) !== ''));
+        }
+
+        return [];
+    }
+
+    private function applyDifficulties($query, array $difficulties)
     {
         return $query->whereIn('difficulty', $difficulties);
     }
 
-    public function buildQueryIngredientCategory($query, $ingredientCategories)
+    private function applyIngredientCategories($query, array $ingredientCategoryIds)
     {
-        return $query->whereIn('id', $ingredientCategories)->orWhere("name","ILIKE","%".request("keyword")."%");
+        // inside belongsToIngredientsCategory relation, filtering by category id is correct
+        return $query->whereIn('id', $ingredientCategoryIds);
     }
 
-    public function buildQueryIngredient($query, $ingredients)
+    private function applyIngredients($query, array $ingredientIds)
     {
-        return $query->whereIn('id', $ingredients)->orWhere("name","ILIKE","%".request("keyword")."%");
+        // inside belongsToIngredients relation, filtering by ingredient id is correct
+        return $query->whereIn('id', $ingredientIds);
     }
 
-    public function buildQueryUtensil($query, $utensils)
+    private function applyUtensils($query, array $utensilIds)
     {
-        return $query->whereIn('id', $utensils)->orWhere("name","ILIKE","%".request("keyword")."%");
+        // inside belongsToUtensil relation, filtering by utensil id is correct
+        return $query->whereIn('id', $utensilIds);
+    }
+
+    private function applyKeywordGlobal($query, ?string $keyword)
+    {
+        $keyword = is_string($keyword) ? trim($keyword) : null;
+        if (!$keyword) return $query;
+
+        // Postgres-friendly "ILIKE"
+        $like = "%{$keyword}%";
+
+        return $query->where(function ($q) use ($like) {
+            // Recipe columns (adjust these to your actual columns)
+            $q->orWhereHas('belongsToRecipeCategory', function ($qq) use ($like) {
+                $qq->where('name', 'ILIKE', $like);
+            })
+
+                // Ingredient name (from recipe ingredients)
+                ->orWhereHas('hasManyRecipeIngredient.belongsToIngredients', function ($qq) use ($like) {
+                    $qq->where('name', 'ILIKE', $like);
+                })
+
+                // Seasoning ingredient name (if you want it included too)
+                ->orWhereHas('hasManyRecipeSeasoning.belongsToIngredients', function ($qq) use ($like) {
+                    $qq->where('name', 'ILIKE', $like);
+                })
+
+                // Ingredient category name
+                ->orWhereHas('hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory', function ($qq) use ($like) {
+                    $qq->where('name', 'ILIKE', $like);
+                })
+
+                // Utensil name
+                ->orWhereHas('hasManyUtensil.belongsToUtensil', function ($qq) use ($like) {
+                    $qq->where('name', 'ILIKE', $like);
+                });
+        });
+    }
+
+    private function applyTimeFallback($query, ?int $requestedTime)
+    {
+        if (!$requestedTime) return $query;
+
+        // If no results <= requestedTime, widen up to: 60, 120, 240, otherwise keep unbounded
+        $thresholds = [$requestedTime, 60, 120, 240];
+
+        foreach ($thresholds as $t) {
+            $candidate = (clone $query)->where('time', '<=', $t);
+            if ($candidate->exists()) {
+                return $query->where('time', '<=', $t);
+            }
+        }
+
+        return $query; // no time restriction if nothing matches even <= 240
     }
 
     public function getAll(Request $request)
     {
-        $difficulties = $request->input('difficulties', []);
-        $ingredients  = $request->input('ingredients', []);
-        $ingredientCategories = $request->input('ingredient_categories', []);
-        $utensils     = $request->input('utensils', []);
-        $diet = request("diet");
-        
-        if (is_string($ingredientCategories)) {
-            $ingredientCategories = array_map('intval', explode(',', $ingredientCategories));
-        }
+        $difficulties         = $request->input('difficulties', []);
+        $ingredientCategories = $this->normalizeIds($request->input('ingredient_categories', []));
+        $ingredients          = $this->normalizeIds($request->input('ingredients', []));
+        $utensils             = $this->normalizeIds($request->input('utensils', []));
+        $diet                 = $request->input('diet');
+        $type                 = $request->input('type');
+        $keyword              = $request->input('keyword');
+        $time                 = $request->input('time');
 
-        if (is_string($ingredients)) {
-            $ingredients = array_map('intval', explode(',', $ingredients));
-        }
-
-        if (is_string($utensils)) {
-            $utensils = array_map('intval', explode(',', $utensils));
-        }
-
-        $breakfasts = Recipe::with([
+        $recipes = Recipe::with([
             'hasManyRecipeIngredient.belongsToIngredients',
             'hasManyRecipeSeasoning.belongsToIngredients',
             'belongsToRecipeCategory',
             'hasManyUtensil.belongsToUtensil',
             'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-        ])
-            ->whereHas('belongsToRecipeCategory', function ($q) {
-                $q->where('name', request('type'));
+        ]);
+
+        if ($type) {
+            $recipes->whereHas('belongsToRecipeCategory', function ($q) use ($type) {
+                $q->where('name', $type);
             });
+        }
 
         if (!empty($difficulties)) {
-            $breakfasts = $this->buildQueryDifficulties($breakfasts, $difficulties);
+            $recipes = $this->applyDifficulties($recipes, (array) $difficulties);
         }
 
         if (!empty($ingredientCategories)) {
-            $breakfasts = $breakfasts->whereHas(
+            $recipes->whereHas(
                 'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-                function ($q) use ($ingredientCategories) {
-                    $this->buildQueryIngredientCategory($q, $ingredientCategories);
-                }
+                fn($q) => $this->applyIngredientCategories($q, $ingredientCategories)
             );
         }
 
         if (!empty($ingredients)) {
-            $breakfasts = $breakfasts->whereHas(
+            $recipes->whereHas(
                 'hasManyRecipeIngredient.belongsToIngredients',
-                function ($q) use ($ingredients) {
-                    $this->buildQueryIngredient($q, $ingredients);
-                }
+                fn($q) => $this->applyIngredients($q, $ingredients)
             );
         }
 
         if (!empty($utensils)) {
-            $breakfasts = $breakfasts->whereHas(
+            $recipes->whereHas(
                 'hasManyUtensil.belongsToUtensil',
-                function ($q) use ($utensils) {
-                    $this->buildQueryUtensil($q, $utensils);
-                }
+                fn($q) => $this->applyUtensils($q, $utensils)
             );
         }
 
         if (!empty($diet)) {
-            $breakfasts = $breakfasts->where("diet", $diet);
+            $recipes->where('diet', $diet);
         }
 
-        $queryHalfHour = clone $breakfasts;
+        $recipes = $this->applyKeywordGlobal($recipes, $keyword);
 
-        if ($queryHalfHour->where("time", "<=", request("time"))->count() == 0) {
-            $queryOneHour = clone $breakfasts;
-            if ($queryOneHour->where("time", "<=", 60)->count() == 0) {
-                $queryTwoHour = clone $breakfasts;
-                if ($queryTwoHour->where("time", "<=", 120)->count() == 0) {
-                    $queryFourHour = clone $breakfasts;
-                    if ($queryFourHour->where("time", "<=", 240)->count() == 0) {
+        $recipes = $this->applyTimeFallback($recipes, is_numeric($time) ? (int) $time : null);
 
-                        $breakfasts = $breakfasts;
-
-                    } else {
-                        $breakfasts = $breakfasts->where("time", "<=", 240);
-                    }
-                } else {
-                    $breakfasts = $breakfasts->where("time", "<=", 120);
-                }
-            } else {
-                $breakfasts = $breakfasts->where("time", "<=", 60);
-            }
-        } else {
-            $breakfasts = $breakfasts->where("time", "<=", request("time"));
-        }
-
-        return $breakfasts->get();
+        return $recipes->get();
     }
 
-    public function getDetails(){
-        $recipe = Recipe::with(['hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-        'hasManyRecipeSeasoning.belongsToIngredients.belongsToIngredientsCategory',
-        "belongsToRecipeCategory",
-        "hasManyUtensil.belongsToUtensil",
-        "hasManySteps"])->findOrFail(request('id'));
+    public function getDetails()
+    {
+        $recipe = Recipe::with([
+            'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
+            'hasManyRecipeSeasoning.belongsToIngredients.belongsToIngredientsCategory',
+            "belongsToRecipeCategory",
+            "hasManyUtensil.belongsToUtensil",
+            "hasManySteps"
+        ])->findOrFail(request('id'));
 
         return $recipe;
     }

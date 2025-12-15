@@ -13,14 +13,17 @@ import {
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AuthenticatedLayout from "../../../../layout/AuthenticatedLayout";
-import useFilterRecipe from "../../../../util/filterHooks";
 import api, { API_BASE_URL } from "../../../../util/api";
+import useFilterRecipeSaved from "../../../../util/filterHooksSaved";
+import { useRouter } from "expo-router";
 
 const ORANGE = "#ff9a20";
 
 export default function Explore() {
   const [data, setData] = useState([]);
-  const { filterRecipe } = useFilterRecipe();
+  const { filterRecipeSaved } = useFilterRecipeSaved();
+
+  const router = useRouter();
 
   const categoryIcons = {
     Breakfast: require("../../../../resource/Breakfast_Randomize.png"),
@@ -32,15 +35,15 @@ export default function Explore() {
 
   useEffect(() => {
     fetchData();
-  }, [filterRecipe]);
+  }, [filterRecipeSaved]);
 
   const fetchData = async () => {
-    const filterParam = JSON.parse(filterRecipe);
+    const filterParam = {...filterRecipeSaved};
 
     filterParam.ingredients = filterParam.ingredients.map(
       (element) => element.id
     );
-
+    
     const res = await api.get(`${API_BASE_URL}/saved-recipe`, {
       params: filterParam,
     });
@@ -56,7 +59,7 @@ export default function Explore() {
         onPress={() =>
           router.push({
             pathname: "/recipe/[id]",
-            params: { id: item.id },
+            params: { id: item.belongs_to_recipe.id },
           })
         }
       >

@@ -33,7 +33,7 @@ const Header = ({ headText, filterRoute }) => {
           <Text style={styles.headerText}>{headText}</Text>
 
           <View style={styles.rightIcons}>
-            {headText === "MEALPLANNER+" ? null : (
+            {headText === "MEALPLANNER+" || headText === "SETTING" ? null : (
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => setShowSearch(true)}
