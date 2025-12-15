@@ -165,6 +165,8 @@ class RecipeController extends Controller
             "hasManySteps"
         ])->findOrFail(request('id'));
 
+        $recipe->share_url = route('recipe.share', ['id' => $recipe->id]);
+
         return $recipe;
     }
 }

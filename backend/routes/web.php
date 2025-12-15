@@ -8,6 +8,7 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\UserSavedRecipeController;
+use App\Http\Controllers\RecipeShareController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,3 +43,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/preferences', [UserPreferencesController::class, 'getPreferences']);
     Route::post('/preferences', [UserPreferencesController::class, 'updatePreferences']);
 });
+Route::get('/share/{id}', [RecipeShareController::class, 'show'])->name('recipe.share');
