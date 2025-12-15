@@ -40,3 +40,7 @@ Route::middleware('auth:sanctum')->post('/save-recipe/{id}', [UserSavedRecipeCon
 Route::middleware('auth:sanctum')->get('/randomize', [RandomizerController::class, 'randomizeMealPlan']);
 Route::middleware('auth:sanctum')->get('/get-preferences', [UserPreferencesController::class, 'getPreferences']);
 Route::middleware('auth:sanctum')->post('/set-preferences', [UserPreferencesController::class, 'updatePreferences']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/preferences', [UserPreferencesController::class, 'getPreferences']);
+    Route::post('/preferences', [UserPreferencesController::class, 'updatePreferences']);
+});

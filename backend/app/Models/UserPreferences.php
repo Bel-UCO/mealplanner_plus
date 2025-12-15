@@ -10,10 +10,17 @@ class UserPreferences extends Model
     // protected $table = 'user_preferences';
 
     // Make these fields mass assignable
+    protected $table = 'user_preferences';
+
     protected $fillable = [
         'id_user',
         'search_by',
+        'difficulty',
         'time',
+        'diet',
+        'category',
+        'ingredient',
+        'utensil',
     ];
 
     // If the table doesn't have created_at / updated_at columns:
