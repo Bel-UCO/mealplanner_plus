@@ -30,7 +30,6 @@ class RandomizerController extends Controller
     public function randomizeMealPlan(Request $request)
     {
         if (request("search_by") === "explore") {
-
             return $this->getRecipeFromDb($request)->inRandomOrder()->get();
         } else {
 

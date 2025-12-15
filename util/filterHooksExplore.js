@@ -15,7 +15,7 @@ export function FilterRecipeExploreProvider({ children }) {
   });
 
   const saveFilterRecipeExplore = useCallback(
-    async (newFilterRecipeExplore) => {
+    (newFilterRecipeExplore) => {
       if (!newFilterRecipeExplore) return;
       setFilterRecipeExplore(newFilterRecipeExplore); // updates everyone using the context
     },

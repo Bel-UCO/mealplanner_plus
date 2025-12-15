@@ -22,6 +22,7 @@ export function FilterRecipeProvider({ children }) {
       diet: "", // "vegan" | "vegetarian" | ""
       time: 30, // minutes
       type: "Breakfast",
+      search_by:"explore"
     })
   );
 

@@ -14,13 +14,10 @@ export function FilterRecipeSavedProvider({ children }) {
     type: "Breakfast",
   });
 
-  const saveFilterRecipeSaved = useCallback(
-    async (newFilterRecipeSaved) => {
-      if (!newFilterRecipeSaved) return;
-      setFilterRecipeSaved(newFilterRecipeSaved); // updates everyone using the context
-    },
-    []
-  );
+  const saveFilterRecipeSaved = useCallback((newFilterRecipeSaved) => {
+    if (!newFilterRecipeSaved) return;
+    setFilterRecipeSaved(newFilterRecipeSaved); // updates everyone using the context
+  }, []);
 
   const value = { filterRecipeSaved, saveFilterRecipeSaved };
 

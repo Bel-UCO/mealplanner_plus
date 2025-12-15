@@ -16,20 +16,36 @@ class UserSavedRecipeController extends Controller
 
     public function buildQueryIngredientCategory($query, $ingredientCategories)
     {
-        return $query->whereIn('id', $ingredientCategories)->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
+        if (!empty($ingredientCategories)) {
+
+            $query = $query->whereIn('id', $ingredientCategories);
+        }
+
+        return $query->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
     }
 
     public function buildQueryIngredient($query, $ingredients)
     {
-        return $query->whereIn('id', $ingredients)->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
+        if (!empty($ingredients)) {
+
+            $query = $query->whereIn('id', $ingredients);
+        }
+
+        return $query->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
     }
 
     public function buildQueryUtensil($query, $utensils)
     {
-        return $query->whereIn('id', $utensils)->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
+        if (!empty($utensils)) {
+
+            $query = $query->whereIn('id', $utensils);
+        }
+
+        return $query->orWhere("name", "ILIKE", "%" . request("keyword") . "%");
     }
 
-    public function getList(Request $request){
+    public function getList(Request $request)
+    {
         return $this->queryUserSavedRecipe($request)->paginate(10);
     }
 
@@ -76,33 +92,26 @@ class UserSavedRecipeController extends Controller
             );
         }
 
+        $breakfasts = $breakfasts->whereHas(
+            'belongsToRecipe.hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
+            function ($q) use ($ingredientCategories) {
+                $q = $this->buildQueryIngredientCategory($q, $ingredientCategories);
+            }
+        );
 
-        if (!empty($ingredientCategories)) {
-            $breakfasts = $breakfasts->whereHas(
-                'belongsToRecipe.hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-                function ($q) use ($ingredientCategories) {
-                    $q = $this->buildQueryIngredientCategory($q, $ingredientCategories);
-                }
-            );
-        }
+        $breakfasts = $breakfasts->whereHas(
+            'belongsToRecipe.hasManyRecipeIngredient.belongsToIngredients',
+            function ($q) use ($ingredients) {
+                $q = $this->buildQueryIngredient($q, $ingredients);
+            }
+        );
 
-        if (!empty($ingredients)) {
-            $breakfasts = $breakfasts->whereHas(
-                'belongsToRecipe.hasManyRecipeIngredient.belongsToIngredients',
-                function ($q) use ($ingredients) {
-                    $q = $this->buildQueryIngredient($q, $ingredients);
-                }
-            );
-        }
-
-        if (!empty($utensils)) {
-            $breakfasts = $breakfasts->whereHas(
-                'belongsToRecipe.hasManyUtensil.belongsToUtensil',
-                function ($q) use ($utensils) {
-                    $q = $this->buildQueryUtensil($q, $utensils);
-                }
-            );
-        }
+        $breakfasts = $breakfasts->whereHas(
+            'belongsToRecipe.hasManyUtensil.belongsToUtensil',
+            function ($q) use ($utensils) {
+                $q = $this->buildQueryUtensil($q, $utensils);
+            }
+        );
 
         if (!empty($diet)) {
             $breakfasts = $breakfasts->whereHas(

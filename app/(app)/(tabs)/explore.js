@@ -39,15 +39,15 @@ export default function Explore() {
   const fetchData = async () => {
     const filterParam = { ...filterRecipeExplore };
 
-    filterParam.ingredients = filterParam.ingredients.map(
-      (element) => element.id
-    );
+    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
 
     const res = await api.get(`${API_BASE_URL}/recipe`, {
-      params: filterRecipeExplore,
+      params: filterParam,
     });
 
+
     setData(res.data); // make sure this is an array
+
   };
 
   const renderRecipe = ({ item }) => {

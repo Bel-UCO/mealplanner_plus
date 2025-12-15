@@ -29,7 +29,7 @@ export default function Home() {
       params: filterParam,
     });    
     
-    setData([...res.data,...lockedRecipes]);
+    setData([...res.data]);
   
   };
 
