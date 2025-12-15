@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import AutoComplete from "../../component/autocomplete";
 import useFilterRecipeSaved from "../../util/filterHooksSaved";
+import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
@@ -22,30 +23,54 @@ const FilterExplore = () => {
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
 
   const categoryIconList = [
-    { id: 1, icon: require("../../resource/Meat.png") },
-    { id: 2, icon: require("../../resource/Chicken.png") },
-    { id: 3, icon: require("../../resource/Seafood.png") },
-    { id: 4, icon: require("../../resource/Processed_meat.png") },
-    { id: 5, icon: require("../../resource/Egg.png") },
-    { id: 6, icon: require("../../resource/Grain.png") },
-    { id: 7, icon: require("../../resource/Vegetable.png") },
-    { id: 8, icon: require("../../resource/Fruit.png") },
-    { id: 9, icon: require("../../resource/Root.png") },
-    { id: 10, icon: require("../../resource/Peanut.png") },
-    { id: 11, icon: require("../../resource/Flour.png") },
-    { id: 12, icon: require("../../resource/Processed_food.png") },
-    { id: 13, icon: require("../../resource/Milk.png") },
-    { id: 14, icon: require("../../resource/Alcohol.png") },
+    { id: 1, icon: require("../../resource/Meat.png"), label: "Meat" },
+    { id: 2, icon: require("../../resource/Chicken.png"), label: "Poultry" },
+    { id: 3, icon: require("../../resource/Seafood.png"), label: "Seafood" },
+    {
+      id: 4,
+      icon: require("../../resource/Processed_meat.png"),
+      label: "Processed Meat",
+    },
+    { id: 5, icon: require("../../resource/Egg.png"), label: "Egg" },
+    { id: 6, icon: require("../../resource/Grain.png"), label: "Grain" },
+    {
+      id: 7,
+      icon: require("../../resource/Vegetable.png"),
+      label: "Vegetable",
+    },
+    { id: 8, icon: require("../../resource/Fruit.png"), label: "Fruit" },
+    {
+      id: 9,
+      icon: require("../../resource/Root.png"),
+      label: "Root Vegetable",
+    },
+    { id: 10, icon: require("../../resource/Peanut.png"), label: "Nut & Seed" },
+    {
+      id: 11,
+      icon: require("../../resource/Flour.png"),
+      label: "Dry Ingredient",
+    },
+    {
+      id: 12,
+      icon: require("../../resource/Processed_food.png"),
+      label: "Ready-Made Product",
+    },
+    { id: 13, icon: require("../../resource/Milk.png"), label: "Milk & Dairy" },
+    { id: 14, icon: require("../../resource/Alcohol.png"), label: "Alcohol" },
   ];
 
   const utensilIconList = [
-    { id: 1, icon: require("../../resource/Blender.png") },
-    { id: 2, icon: require("../../resource/Chopper.png") },
-    { id: 3, icon: require("../../resource/Mixer.png") },
-    { id: 4, icon: require("../../resource/Microwave.png") },
-    { id: 5, icon: require("../../resource/Oven.png") },
-    { id: 6, icon: require("../../resource/Grinder.png") },
-    { id: 7, icon: require("../../resource/Shaker.png") },
+    { id: 1, icon: require("../../resource/Blender.png"), label: "Blender" },
+    { id: 2, icon: require("../../resource/Chopper.png"), label: "Chopper" },
+    { id: 3, icon: require("../../resource/Mixer.png"), label: "Mixer" },
+    {
+      id: 4,
+      icon: require("../../resource/Microwave.png"),
+      label: "Microwave",
+    },
+    { id: 5, icon: require("../../resource/Oven.png"), label: "Oven" },
+    { id: 6, icon: require("../../resource/Grinder.png"), label: "Grinder" },
+    { id: 7, icon: require("../../resource/Shaker.png"), label: "Shaker" },
   ];
 
   const toggleDifficulty = (value) => {
@@ -115,31 +140,55 @@ const FilterExplore = () => {
   };
 
   const CategoryFilterButtonTemplate = ({ id, icon }) => {
+    const [showTip, setShowTip] = useState(false);
     return (
-      <TouchableOpacity
-        style={[
-          styles.squareButton,
-          filterObject.ingredient_categories.includes(id) &&
-            styles.squareButtonActive,
-        ]}
-        onPress={() => toggleCategory(id)}
+      <Tooltip
+        isVisible={showTip}
+        content={<Text style={{ padding: 6, color: "#000" }}>{label}</Text>}
+        placement="top"
+        onClose={() => setShowTip(false)}
       >
-        <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.squareButton,
+            filterObject.ingredient_categories.includes(id) &&
+              styles.squareButtonActive,
+          ]}
+          onPress={() => toggleCategory(id)}
+          onLongPress={() => setShowTip(true)}
+          delayLongPress={250}
+        >
+          <Image
+            source={icon}
+            style={styles.typeIconImg}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </Tooltip>
     );
   };
 
   const UtensilFilterButtonTemplate = ({ id, icon }) => {
+    const [showTip, setShowTip] = useState(false);
     return (
+      <Tooltip
+        isVisible={showTip}
+        content={<Text style={{ padding: 6, color: "#000" }}>{label}</Text>}
+        placement="top"
+        onClose={() => setShowTip(false)}
+      >
       <TouchableOpacity
         style={[
           styles.squareButton,
           filterObject.utensils.includes(id) && styles.squareButtonActive,
         ]}
         onPress={() => toggleUtensil(id)}
+        onLongPress={() => setShowTip(true)}
+        delayLongPress={250}
       >
         <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
       </TouchableOpacity>
+      </Tooltip>
     );
   };
 
@@ -434,6 +483,7 @@ const FilterExplore = () => {
                   key={element.id}
                   id={element.id}
                   icon={element.icon}
+                  label={element.label}
                 />
               ))}
             </View>
@@ -462,6 +512,7 @@ const FilterExplore = () => {
                   key={element.id}
                   id={element.id}
                   icon={element.icon}
+                  label={element.label}
                 />
               ))}
             </View>

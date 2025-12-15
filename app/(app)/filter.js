@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import useFilterRecipe from "../../util/filterHooks";
 import AutoComplete from "../../component/autocomplete";
+import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
@@ -20,31 +21,57 @@ const Filter = () => {
   const [filterObject, setFilterObject] = useState(JSON.parse(filterRecipe));
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
 
+  const [activeTooltip, setActiveTooltip] = useState(null);
+
   const categoryIconList = [
-    { id: 1, icon: require("../../resource/Meat.png") },
-    { id: 2, icon: require("../../resource/Chicken.png") },
-    { id: 3, icon: require("../../resource/Seafood.png") },
-    { id: 4, icon: require("../../resource/Processed_meat.png") },
-    { id: 5, icon: require("../../resource/Egg.png") },
-    { id: 6, icon: require("../../resource/Grain.png") },
-    { id: 7, icon: require("../../resource/Vegetable.png") },
-    { id: 8, icon: require("../../resource/Fruit.png") },
-    { id: 9, icon: require("../../resource/Root.png") },
-    { id: 10, icon: require("../../resource/Peanut.png") },
-    { id: 11, icon: require("../../resource/Flour.png") },
-    { id: 12, icon: require("../../resource/Processed_food.png") },
-    { id: 13, icon: require("../../resource/Milk.png") },
-    { id: 14, icon: require("../../resource/Alcohol.png") },
+    { id: 1, icon: require("../../resource/Meat.png"), label: "Meat" },
+    { id: 2, icon: require("../../resource/Chicken.png"), label: "Poultry" },
+    { id: 3, icon: require("../../resource/Seafood.png"), label: "Seafood" },
+    {
+      id: 4,
+      icon: require("../../resource/Processed_meat.png"),
+      label: "Processed Meat",
+    },
+    { id: 5, icon: require("../../resource/Egg.png"), label: "Egg" },
+    { id: 6, icon: require("../../resource/Grain.png"), label: "Grain" },
+    {
+      id: 7,
+      icon: require("../../resource/Vegetable.png"),
+      label: "Vegetable",
+    },
+    { id: 8, icon: require("../../resource/Fruit.png"), label: "Fruit" },
+    {
+      id: 9,
+      icon: require("../../resource/Root.png"),
+      label: "Root Vegetable",
+    },
+    { id: 10, icon: require("../../resource/Peanut.png"), label: "Nut & Seed" },
+    {
+      id: 11,
+      icon: require("../../resource/Flour.png"),
+      label: "Dry Ingredient",
+    },
+    {
+      id: 12,
+      icon: require("../../resource/Processed_food.png"),
+      label: "Ready-Made Product",
+    },
+    { id: 13, icon: require("../../resource/Milk.png"), label: "Milk & Dairy" },
+    { id: 14, icon: require("../../resource/Alcohol.png"), label: "Alcohol" },
   ];
 
   const utensilIconList = [
-    { id: 1, icon: require("../../resource/Blender.png") },
-    { id: 2, icon: require("../../resource/Chopper.png") },
-    { id: 3, icon: require("../../resource/Mixer.png") },
-    { id: 4, icon: require("../../resource/Microwave.png") },
-    { id: 5, icon: require("../../resource/Oven.png") },
-    { id: 6, icon: require("../../resource/Grinder.png") },
-    { id: 7, icon: require("../../resource/Shaker.png") },
+    { id: 1, icon: require("../../resource/Blender.png"), label: "Blender" },
+    { id: 2, icon: require("../../resource/Chopper.png"), label: "Chopper" },
+    { id: 3, icon: require("../../resource/Mixer.png"), label: "Mixer" },
+    {
+      id: 4,
+      icon: require("../../resource/Microwave.png"),
+      label: "Microwave",
+    },
+    { id: 5, icon: require("../../resource/Oven.png"), label: "Oven" },
+    { id: 6, icon: require("../../resource/Grinder.png"), label: "Grinder" },
+    { id: 7, icon: require("../../resource/Shaker.png"), label: "Shaker" },
   ];
 
   const handleSearchByPress = (value) => {
@@ -74,6 +101,7 @@ const Filter = () => {
   };
 
   const handleDietPress = (diet) => {
+    utensil;
     setFilterObject((prev) => ({
       ...prev,
       diet: prev.diet === diet ? "" : diet,
@@ -118,32 +146,60 @@ const Filter = () => {
     return result;
   };
 
-  const CategoryFilterButtonTemplate = ({ id, icon }) => {
+  const CategoryFilterButtonTemplate = ({ id, icon, label }) => {
+    const [showTip, setShowTip] = useState(false);
     return (
-      <TouchableOpacity
-        style={[
-          styles.squareButton,
-          filterObject.ingredient_categories.includes(id) &&
-            styles.squareButtonActive,
-        ]}
-        onPress={() => toggleCategory(id)}
+      <Tooltip
+        isVisible={showTip}
+        content={<Text style={{ padding: 6, color: "#000" }}>{label}</Text>}
+        placement="top"
+        onClose={() => setShowTip(false)}
       >
-        <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.squareButton,
+            filterObject.ingredient_categories.includes(id) &&
+              styles.squareButtonActive,
+          ]}
+          onPress={() => toggleCategory(id)}
+          onLongPress={() => setShowTip(true)}
+          delayLongPress={250}
+        >
+          <Image
+            source={icon}
+            style={styles.typeIconImg}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </Tooltip>
     );
   };
 
-  const UtensilFilterButtonTemplate = ({ id, icon }) => {
+  const UtensilFilterButtonTemplate = ({ id, icon, label }) => {
+    const [showTip, setShowTip] = useState(false);
     return (
-      <TouchableOpacity
-        style={[
-          styles.squareButton,
-          filterObject.utensils.includes(id) && styles.squareButtonActive,
-        ]}
-        onPress={() => toggleUtensil(id)}
+      <Tooltip
+        isVisible={showTip}
+        content={<Text style={{ padding: 6, color: "#000" }}>{label}</Text>}
+        placement="top"
+        onClose={() => setShowTip(false)}
       >
-        <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.squareButton,
+            filterObject.utensils.includes(id) && styles.squareButtonActive,
+          ]}
+          onPress={() => toggleUtensil(id)}
+          onLongPress={() => setShowTip(true)}
+          delayLongPress={250}
+        >
+          <Image
+            source={icon}
+            style={styles.typeIconImg}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </Tooltip>
     );
   };
 
@@ -381,6 +437,7 @@ const Filter = () => {
                   key={element.id}
                   id={element.id}
                   icon={element.icon}
+                  label={element.label}
                 />
               ))}
             </View>
@@ -407,6 +464,7 @@ const Filter = () => {
                   key={element.id}
                   id={element.id}
                   icon={element.icon}
+                  label={element.label}
                 />
               ))}
             </View>
@@ -421,42 +479,41 @@ const Filter = () => {
 };
 
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
     backgroundColor: ORANGE,
   },
-  
+
   scroll: {
     paddingTop: 36,
     paddingHorizontal: 18,
     paddingBottom: 160,
   },
-  
+
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
   },
-  
+
   backArrow: {
     fontSize: 22,
     marginRight: 12,
     color: "#000",
   },
-  
+
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#000",
   },
-  
+
   divider: {
     height: 1,
     backgroundColor: "#000",
     marginBottom: 16,
   },
-  
+
   sectionTitle: {
     marginTop: 10,
     marginBottom: 6,
@@ -464,18 +521,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
   },
-  
+
   searchByRow: {
     flexDirection: "row",
     marginBottom: 8,
   },
-  
+
   searchByItem: {
     flexDirection: "row",
     alignItems: "center",
     marginRight: 18,
   },
-  
+
   radioOuter: {
     width: 14,
     height: 14,
@@ -487,25 +544,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 6,
   },
-  
+
   radioInner: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: "#000",
   },
-  
+
   searchByText: {
     fontSize: 12,
     fontWeight: "bold",
     color: "#000",
   },
-  
+
   difficultyRow: {
     flexDirection: "row",
     marginBottom: 4,
   },
-  
+
   difficultyItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -529,31 +586,31 @@ const styles = StyleSheet.create({
     marginRight: 6,
     backgroundColor: "#FFFFFF",
   },
-  
+
   checkboxActive: {
     backgroundColor: "#000000",
   },
-  
+
   difficultyText: {
     fontSize: 12,
     color: "#000",
   },
-  
+
   sliderContainer: {
     marginTop: 4,
   },
-  
+
   sliderWrapper: {
     height: 18,
     justifyContent: "center",
   },
-  
+
   sliderTrack: {
     height: 3,
     borderRadius: 2,
     backgroundColor: "#FFF",
   },
-  
+
   sliderDotsRow: {
     position: "absolute",
     left: 0,
@@ -563,7 +620,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
     alignItems: "center",
   },
-  
+
   sliderDotOuter: {
     width: 12,
     height: 12,
@@ -574,35 +631,35 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  
+
   sliderDotOuterActive: {
     borderColor: "#1BA1FF",
   },
-  
+
   sliderDotInner: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: "#1BA1FF",
   },
-  
+
   timeLabelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 4,
   },
-  
+
   timeLabel: {
     fontSize: 10,
     color: "#000",
   },
-  
+
   typeRow: {
     flexDirection: "row",
     marginTop: 4,
     marginBottom: 4,
   },
-  
+
   squareButton: {
     width: 44,
     height: 44,
@@ -622,16 +679,16 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
   },
-  
+
   squareIconEmoji: {
     fontSize: 18,
   },
-  
+
   chipRow: {
     flexDirection: "row",
     marginTop: 4,
   },
-  
+
   chip: {
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
@@ -639,17 +696,17 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 8,
   },
-  
+
   chipActive: {
     backgroundColor: "#A0A0A0",
   },
-  
+
   chipText: {
     fontSize: 12,
     fontWeight: "bold",
     color: "#000",
   },
-  
+
   iconGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -660,7 +717,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 8,
   },
-  
+
   ingredientWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -670,23 +727,23 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginTop: 4,
   },
-  
+
   ingredientPill: {
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 16,
     backgroundColor: "#FFFFFF",
   },
-  
+
   ingredientPillActive: {
     backgroundColor: "#8C8C8C",
   },
-  
+
   ingredientText: {
     fontSize: 12,
     color: "#000",
   },
-  
+
   ingredientPlusCircle: {
     width: 26,
     height: 26,
@@ -699,12 +756,12 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginRight: "auto",
   },
-  
+
   ingredientPlus: {
     fontSize: 16,
     color: "#000",
   },
-  
+
   dropdownArrow: {
     fontSize: 18,
     color: "#000",
@@ -720,7 +777,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: "center",
   },
-  
+
   applyText: {
     fontSize: 14,
     fontWeight: "bold",
