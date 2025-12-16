@@ -166,7 +166,7 @@ export default function Home() {
       <FlatList
         style={{ flex: 1, width: "96%" }}
         data={data}
-        keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
+        keyExtractor={(item, index) => index}
         renderItem={({ item }) => (
           <Menu
             title={item.name}

@@ -92,7 +92,7 @@ export default function Explore() {
         <FlatList
           data={data}
           renderItem={renderRecipe}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => index}
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
           showsVerticalScrollIndicator={false}

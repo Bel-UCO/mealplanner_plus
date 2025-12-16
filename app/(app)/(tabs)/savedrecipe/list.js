@@ -38,12 +38,12 @@ export default function Explore() {
   }, [filterRecipeSaved]);
 
   const fetchData = async () => {
-    const filterParam = {...filterRecipeSaved};
+    const filterParam = { ...filterRecipeSaved };
 
     filterParam.ingredients = filterParam.ingredients.map(
       (element) => element.id
     );
-    
+
     const res = await api.get(`${API_BASE_URL}/saved-recipe`, {
       params: filterParam,
     });
@@ -101,7 +101,7 @@ export default function Explore() {
         <FlatList
           data={data}
           renderItem={renderRecipe}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => index}
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
           showsVerticalScrollIndicator={false}
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     top: 8,
     left: 8,
   },
-  
+
   categoryIcon: {
     width: 26,
     height: 26,
