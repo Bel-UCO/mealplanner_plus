@@ -34,15 +34,8 @@ export default function RecipeDetail() {
   };
 
   const saveRecipe = async () => {
-    try {
       setLoading(true);
       const res = await api.post(`${API_BASE_URL}/save-recipe/${id}`);
-      console.log(res);
-    } catch (err) {
-      console.log("ERROR FETCHING RECIPE:", err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   if (loading) {
@@ -102,9 +95,6 @@ export default function RecipeDetail() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.icon}
-                  onPress={() => {
-                    saveRecipe();
-                  }}
                 >
                   <Image
                     source={require("../../../../resource/Share.png")}
