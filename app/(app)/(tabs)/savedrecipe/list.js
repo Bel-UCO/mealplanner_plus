@@ -33,12 +33,12 @@ export default function Explore() {
     Drink: require("../../../../resource/Drink_Randomize.png"),
   };
 
-  useEffect(() => {
+  useEffect(() => {    
     fetchData();
   }, [filterRecipeSaved]);
 
   const fetchData = async () => {
-    const filterParam = { ...filterRecipeSaved };
+    const filterParam = { ...filterRecipeSaved };    
 
     filterParam.ingredients = filterParam.ingredients.map(
       (element) => element.id

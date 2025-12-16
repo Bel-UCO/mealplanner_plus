@@ -11,7 +11,7 @@ export function FilterRecipeSavedProvider({ children }) {
     utensils: [], // string[]
     diet: "", // "vegan" | "vegetarian" | ""
     time: 30, // minutes
-    type: "Breakfast",
+    type: [],
   });
 
   const saveFilterRecipeSaved = useCallback((newFilterRecipeSaved) => {

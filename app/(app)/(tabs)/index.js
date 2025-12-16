@@ -9,158 +9,84 @@ import * as SecureStore from "expo-secure-store";
 
 const RECIPE_KEY = "LOCKED_RECIPES";
 
+const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Dessert", "Drink"];
+
 export default function Home() {
   const [data, setData] = useState([]);
   const { triggerFilterRecipeChange, filterRecipe } = useFilterRecipe();
   const router = useRouter();
 
-  useEffect(() => {    
-    console.log("fetch random");
+  useEffect(() => {
     fetchData();
   }, [triggerFilterRecipeChange]);
 
-  const fetchDataBreakfast = async () => {
+  const fetchDataByType = async (type) => {
     const filterParam = JSON.parse(filterRecipe);
     filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
 
     const stored = await SecureStore.getItemAsync(RECIPE_KEY);
-    const lockedRecipes = stored ? JSON.parse(stored) : [];
+    const lockedRecipes = stored ? JSON.parse(stored) : {};
 
-    const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: { ...filterParam, type: "Breakfast" },
+    if (lockedRecipes[type]) {
+      return lockedRecipes[type];
+    }
+
+    let res = await api.get(`${API_BASE_URL}/randomize`, {
+      params: {
+        difficulties: [],
+        ingredients: [],
+        ingredient_categories: [],
+        utensils: [],
+        diet: filterParam?.diet,
+        time: 30,
+        search_by: "explore",
+        type,
+      },
     });
 
-    return lockedRecipes[0]
-      ? lockedRecipes[0]
-      : res?.data[0]?.belongs_to_recipe
-      ? res.data[0].belongs_to_recipe
-      : res?.data[0];
+    if (!res?.data?.length) {
+      res = await api.get(`${API_BASE_URL}/randomize`, {
+        params: { ...filterParam, type },
+      });
+    }
+
+    const recipe =
+      res?.data[0]?.belongs_to_recipe ?? res?.data[0];
+
+    return recipe ? { ...recipe, type, locked: false } : null;
   };
 
-  const fetchDataLunch = async () => {
-    const filterParam = JSON.parse(filterRecipe);
-    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
-
-    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
-    const lockedRecipes = stored ? JSON.parse(stored) : [];
-
-    const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: { ...filterParam, type: "Lunch" },
-    });
-
-    return lockedRecipes[1]
-      ? lockedRecipes[1]
-      : res?.data[0]?.belongs_to_recipe
-      ? res.data[0].belongs_to_recipe
-      : res?.data[0];
-  };
-
-  const fetchDataDinner = async () => {
-    const filterParam = JSON.parse(filterRecipe);
-    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
-
-    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
-    const lockedRecipes = stored ? JSON.parse(stored) : [];
-
-    const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: { ...filterParam, type: "Dinner" },
-    });
-
-    return lockedRecipes[2]
-      ? lockedRecipes[2]
-      : res?.data[0]?.belongs_to_recipe
-      ? res.data[0].belongs_to_recipe
-      : res?.data[0];
-  };
-
-  const fetchDataDessert = async () => {
-    const filterParam = JSON.parse(filterRecipe);
-    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
-
-    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
-    const lockedRecipes = stored ? JSON.parse(stored) : [];
-
-    const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: { ...filterParam, type: "Dessert" },
-    });
-
-    return lockedRecipes[3]
-      ? lockedRecipes[3]
-      : res?.data[0]?.belongs_to_recipe
-      ? res.data[0].belongs_to_recipe
-      : res?.data[0];
-  };
-
-  const fetchDataDrink = async () => {
-    const filterParam = JSON.parse(filterRecipe);
-    filterParam.ingredients = filterParam.ingredients.map((x) => x.id);
-
-    const stored = await SecureStore.getItemAsync(RECIPE_KEY);
-    const lockedRecipes = stored ? JSON.parse(stored) : [];
-
-    const res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: { ...filterParam, type: "Drink" },
-    });
-
-    return lockedRecipes[4]
-      ? lockedRecipes[4]
-      : res?.data[0]?.belongs_to_recipe
-      ? res.data[0].belongs_to_recipe
-      : res?.data[0];
-  };
 
   const fetchData = async () => {
-    const [resBreakfast, resLunch, resDinner, resDessert, resDrink] =
-      await Promise.all([
-        fetchDataBreakfast(),
-        fetchDataLunch(),
-        fetchDataDinner(),
-        fetchDataDessert(),
-        fetchDataDrink(),
-      ]);
+    const results = await Promise.all(
+      MEAL_TYPES.map((type) => fetchDataByType(type))
+    );
 
-    const arrOfData = [];
-
-    if (resBreakfast) {
-      arrOfData.push(resBreakfast);
-    }
-
-    if (resLunch) {
-      arrOfData.push(resLunch);
-    }
-
-    if (resDinner) {
-      arrOfData.push(resDinner);
-    }
-
-    if (resDessert) {
-      arrOfData.push(resDessert);
-    }
-
-    if (resDrink) {
-      arrOfData.push(resDrink);
-    }
-
-    setData(arrOfData);
+    setData(results.filter(Boolean));
   };
 
   const lockRecipe = async (recipe) => {
     const stored = await SecureStore.getItemAsync(RECIPE_KEY);
-    let lockedRecipes = stored ? JSON.parse(stored) : [];
+    const lockedRecipes = stored ? JSON.parse(stored) : {};
 
-    const exists = lockedRecipes.find((x) => x.id === recipe.id);
+    const type = recipe.type;
 
-    if (exists) {
-      lockedRecipes = lockedRecipes.filter((x) => x.id !== recipe.id);
+    if (lockedRecipes[type]?.id === recipe.id) {
+      delete lockedRecipes[type];
     } else {
-      lockedRecipes.push({ ...recipe, locked: true });
+      lockedRecipes[type] = { ...recipe, locked: true };
     }
 
-    await SecureStore.setItemAsync(RECIPE_KEY, JSON.stringify(lockedRecipes));
+    await SecureStore.setItemAsync(
+      RECIPE_KEY,
+      JSON.stringify(lockedRecipes)
+    );
 
     setData((prev) =>
       prev.map((item) =>
-        item.id === recipe.id ? { ...item, locked: !item.locked } : item
+        item.id === recipe.id
+          ? { ...item, locked: !item.locked }
+          : item
       )
     );
   };
@@ -170,12 +96,12 @@ export default function Home() {
       <FlatList
         style={{ flex: 1, width: "96%" }}
         data={data}
-        keyExtractor={(item, index) => index}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <Menu
             title={item.name}
             image={item.image}
-            recipe_category={item.belongs_to_recipe_category.name}
+            recipe_category={item.belongs_to_recipe_category?.name}
             locked={item.locked}
             onPress={() =>
               router.push({

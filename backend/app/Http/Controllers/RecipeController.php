@@ -12,7 +12,23 @@ class RecipeController extends Controller
         if (is_array($value)) return array_map('intval', $value);
 
         if (is_string($value) && trim($value) !== '') {
-            return array_map('intval', array_filter(explode(',', $value), fn($v) => trim($v) !== ''));
+            return array_map(
+                'intval',
+                array_filter(explode(',', $value), fn ($v) => trim($v) !== '')
+            );
+        }
+
+        return [];
+    }
+
+    private function normalizeStrings($value): array
+    {
+        if (is_array($value)) {
+            return array_values(array_filter(array_map('trim', $value)));
+        }
+
+        if (is_string($value) && trim($value) !== '') {
+            return array_values(array_filter(array_map('trim', explode(',', $value))));
         }
 
         return [];
@@ -25,19 +41,16 @@ class RecipeController extends Controller
 
     private function applyIngredientCategories($query, array $ingredientCategoryIds)
     {
-        // inside belongsToIngredientsCategory relation, filtering by category id is correct
         return $query->whereIn('id', $ingredientCategoryIds);
     }
 
     private function applyIngredients($query, array $ingredientIds)
     {
-        // inside belongsToIngredients relation, filtering by ingredient id is correct
         return $query->whereIn('id', $ingredientIds);
     }
 
     private function applyUtensils($query, array $utensilIds)
     {
-        // inside belongsToUtensil relation, filtering by utensil id is correct
         return $query->whereIn('id', $utensilIds);
     }
 
@@ -46,34 +59,25 @@ class RecipeController extends Controller
         $keyword = is_string($keyword) ? trim($keyword) : null;
         if (!$keyword) return $query;
 
-        // Postgres-friendly "ILIKE"
         $like = "%{$keyword}%";
 
         return $query->where(function ($q) use ($like) {
-            // Recipe columns (adjust these to your actual columns)
-            $q->orWhereHas('belongsToRecipeCategory', function ($qq) use ($like) {
-                $qq->where('name', 'ILIKE', $like);
-            })
-
-                // Ingredient name (from recipe ingredients)
-                ->orWhereHas('hasManyRecipeIngredient.belongsToIngredients', function ($qq) use ($like) {
-                    $qq->where('name', 'ILIKE', $like);
-                })
-
-                // Seasoning ingredient name (if you want it included too)
-                ->orWhereHas('hasManyRecipeSeasoning.belongsToIngredients', function ($qq) use ($like) {
-                    $qq->where('name', 'ILIKE', $like);
-                })
-
-                // Ingredient category name
-                ->orWhereHas('hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory', function ($qq) use ($like) {
-                    $qq->where('name', 'ILIKE', $like);
-                })
-
-                // Utensil name
-                ->orWhereHas('hasManyUtensil.belongsToUtensil', function ($qq) use ($like) {
-                    $qq->where('name', 'ILIKE', $like);
-                });
+            $q->orWhereHas('belongsToRecipeCategory', fn ($qq) =>
+                    $qq->where('name', 'ILIKE', $like)
+                )
+                ->orWhereHas('hasManyRecipeIngredient.belongsToIngredients', fn ($qq) =>
+                    $qq->where('name', 'ILIKE', $like)
+                )
+                ->orWhereHas('hasManyRecipeSeasoning.belongsToIngredients', fn ($qq) =>
+                    $qq->where('name', 'ILIKE', $like)
+                )
+                ->orWhereHas(
+                    'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
+                    fn ($qq) => $qq->where('name', 'ILIKE', $like)
+                )
+                ->orWhereHas('hasManyUtensil.belongsToUtensil', fn ($qq) =>
+                    $qq->where('name', 'ILIKE', $like)
+                );
         });
     }
 
@@ -81,7 +85,6 @@ class RecipeController extends Controller
     {
         if (!$requestedTime) return $query;
 
-        // If no results <= requestedTime, widen up to: 60, 120, 240, otherwise keep unbounded
         $thresholds = [$requestedTime, 60, 120, 240];
 
         foreach ($thresholds as $t) {
@@ -91,17 +94,17 @@ class RecipeController extends Controller
             }
         }
 
-        return $query; // no time restriction if nothing matches even <= 240
+        return $query;
     }
 
     public function getAll(Request $request)
     {
-        $difficulties         = $request->input('difficulties', []);
+        $difficulties         = (array) $request->input('difficulties', []);
         $ingredientCategories = $this->normalizeIds($request->input('ingredient_categories', []));
         $ingredients          = $this->normalizeIds($request->input('ingredients', []));
         $utensils             = $this->normalizeIds($request->input('utensils', []));
         $diet                 = $request->input('diet');
-        $type                 = $request->input('type');
+        $type                 = $this->normalizeStrings($request->input('type', []));
         $keyword              = $request->input('keyword');
         $time                 = $request->input('time');
 
@@ -113,34 +116,34 @@ class RecipeController extends Controller
             'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
         ]);
 
-        if ($type) {
-            $recipes->whereHas('belongsToRecipeCategory', function ($q) use ($type) {
-                $q->where('name', $type);
-            });
+        if (!empty($type)) {
+            $recipes->whereHas('belongsToRecipeCategory', fn ($q) =>
+                $q->whereIn('name', $type)
+            );
         }
 
         if (!empty($difficulties)) {
-            $recipes = $this->applyDifficulties($recipes, (array) $difficulties);
+            $recipes = $this->applyDifficulties($recipes, $difficulties);
         }
 
         if (!empty($ingredientCategories)) {
             $recipes->whereHas(
                 'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-                fn($q) => $this->applyIngredientCategories($q, $ingredientCategories)
+                fn ($q) => $this->applyIngredientCategories($q, $ingredientCategories)
             );
         }
 
         if (!empty($ingredients)) {
             $recipes->whereHas(
                 'hasManyRecipeIngredient.belongsToIngredients',
-                fn($q) => $this->applyIngredients($q, $ingredients)
+                fn ($q) => $this->applyIngredients($q, $ingredients)
             );
         }
 
         if (!empty($utensils)) {
             $recipes->whereHas(
                 'hasManyUtensil.belongsToUtensil',
-                fn($q) => $this->applyUtensils($q, $utensils)
+                fn ($q) => $this->applyUtensils($q, $utensils)
             );
         }
 
@@ -149,7 +152,6 @@ class RecipeController extends Controller
         }
 
         $recipes = $this->applyKeywordGlobal($recipes, $keyword);
-
         $recipes = $this->applyTimeFallback($recipes, is_numeric($time) ? (int) $time : null);
 
         return $recipes->get();
@@ -160,9 +162,9 @@ class RecipeController extends Controller
         $recipe = Recipe::with([
             'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
             'hasManyRecipeSeasoning.belongsToIngredients.belongsToIngredientsCategory',
-            "belongsToRecipeCategory",
-            "hasManyUtensil.belongsToUtensil",
-            "hasManySteps"
+            'belongsToRecipeCategory',
+            'hasManyUtensil.belongsToUtensil',
+            'hasManySteps'
         ])->findOrFail(request('id'));
 
         $recipe->share_url = route('recipe.share', ['id' => $recipe->id]);

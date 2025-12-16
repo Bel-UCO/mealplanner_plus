@@ -100,10 +100,14 @@ const FilterExplore = () => {
   };
 
   const handleTypePress = (typeValue) => {
-    setFilterObject((prev) => ({
-      ...prev,
-      type: prev.type === typeValue ? "" : typeValue,
-    }));
+    setFilterObject((prev) => {
+      const exists = prev.type.includes(typeValue);
+      const type = exists
+        ? prev.type.filter((t) => t !== typeValue)
+        : [...prev.type, typeValue];
+
+      return { ...prev, type };
+    });
   };
 
   const toggleCategory = (id) => {
@@ -139,7 +143,7 @@ const FilterExplore = () => {
     return result;
   };
 
-  const CategoryFilterButtonTemplate = ({ id, icon }) => {
+  const CategoryFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
     return (
       <Tooltip
@@ -168,7 +172,7 @@ const FilterExplore = () => {
     );
   };
 
-  const UtensilFilterButtonTemplate = ({ id, icon }) => {
+  const UtensilFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
     return (
       <Tooltip
@@ -177,17 +181,21 @@ const FilterExplore = () => {
         placement="top"
         onClose={() => setShowTip(false)}
       >
-      <TouchableOpacity
-        style={[
-          styles.squareButton,
-          filterObject.utensils.includes(id) && styles.squareButtonActive,
-        ]}
-        onPress={() => toggleUtensil(id)}
-        onLongPress={() => setShowTip(true)}
-        delayLongPress={250}
-      >
-        <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.squareButton,
+            filterObject.utensils.includes(id) && styles.squareButtonActive,
+          ]}
+          onPress={() => toggleUtensil(id)}
+          onLongPress={() => setShowTip(true)}
+          delayLongPress={250}
+        >
+          <Image
+            source={icon}
+            style={styles.typeIconImg}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </Tooltip>
     );
   };
@@ -381,7 +389,8 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type === "Breakfast" && styles.squareButtonActive,
+              filterObject.type.includes("Breakfast") &&
+                styles.squareButtonActive,
             ]}
             onPress={() => handleTypePress("Breakfast")}
           >
@@ -395,7 +404,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type === "Lunch" && styles.squareButtonActive,
+              filterObject.type.includes("Lunch") && styles.squareButtonActive,
             ]}
             onPress={() => handleTypePress("Lunch")}
           >
@@ -409,7 +418,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type === "Dinner" && styles.squareButtonActive,
+              filterObject.type.includes("Dinner") && styles.squareButtonActive,
             ]}
             onPress={() => handleTypePress("Dinner")}
           >
@@ -423,7 +432,8 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type === "Dessert" && styles.squareButtonActive,
+              filterObject.type.includes("Dessert") &&
+                styles.squareButtonActive,
             ]}
             onPress={() => handleTypePress("Dessert")}
           >
@@ -437,7 +447,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type === "Drink" && styles.squareButtonActive,
+              filterObject.type.includes("Drink") && styles.squareButtonActive,
             ]}
             onPress={() => handleTypePress("Drink")}
           >

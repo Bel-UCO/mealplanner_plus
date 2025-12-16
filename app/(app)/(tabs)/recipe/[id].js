@@ -34,8 +34,9 @@ export default function RecipeDetail() {
   };
 
   const saveRecipe = async () => {
-      console.log(`${API_BASE_URL}/save-recipe/${id}`);
       const res = await api.post(`${API_BASE_URL}/save-recipe/${id}`);
+      console.log(res.data);
+      
   };
 
   if (loading) {
