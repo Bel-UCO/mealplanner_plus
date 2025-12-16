@@ -39,7 +39,6 @@ export function FilterRecipeProvider({ children }) {
   };
 
   useEffect(() => {
-    fetchUserPreference();
     (async () => {
       try {
         const stored = await SecureStore.getItemAsync(RECIPE_KEY);
