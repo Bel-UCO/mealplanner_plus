@@ -101,7 +101,6 @@ const Filter = () => {
   };
 
   const handleDietPress = (diet) => {
-    utensil;
     setFilterObject((prev) => ({
       ...prev,
       diet: prev.diet === diet ? "" : diet,
