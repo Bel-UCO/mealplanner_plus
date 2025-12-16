@@ -177,7 +177,7 @@ class UserSavedRecipeController extends Controller
     public function userSaveRecipe(Request $request)
     {
         $user = Auth::user();
-        $recipeId = $request->input('id');
+        $recipeId = request('id');
 
         $selected = UserSavedRecipe::where('id_user', $user->id)
             ->where('id_recipe', $recipeId)

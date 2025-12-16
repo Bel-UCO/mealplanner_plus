@@ -48,7 +48,11 @@ export default function Home() {
       params: { ...filterParam, type: "Lunch" },
     });
 
-    return lockedRecipes[1] ? lockedRecipes[1] : res?.data[0];
+    return lockedRecipes[1]
+      ? lockedRecipes[1]
+      : res?.data[0]?.belongs_to_recipe
+      ? res.data[0].belongs_to_recipe
+      : res?.data[0];
   };
 
   const fetchDataDinner = async () => {
