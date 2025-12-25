@@ -11,15 +11,44 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import AuthenticatedLayout from "../../../../layout/AuthenticatedLayout";
 import api, { API_BASE_URL } from "../../../../util/api";
+import * as Linking from "expo-linking";
+
+import { Linking, Alert } from "react-native";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+  const shareUrl = Linking.createURL("/(app)/(tabs)/recipe" + id);
 
   useEffect(() => {
     loadRecipe();
   }, [id]);
+
+  const shareToWhatsApp = async (message) => {
+    const url = `https://wa.me/?text=${shareUrl}`;
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (!supported) {
+        Alert.alert("Can't open link", url);
+        return;
+      }
+      await Linking.openURL(url);
+    } catch (e) {
+      Alert.alert("Error", String(e));
+    }
+  };
+
+  const shareToTelegram = async () => {
+    const tgUrl = `https://t.me/share/url?text=${shareUrl}`;
+
+    try {
+      await Linking.openURL(tgUrl);
+    } catch (e) {
+      Alert.alert("Error", String(e));
+    }
+  };
 
   const loadRecipe = async () => {
     try {
@@ -34,9 +63,7 @@ export default function RecipeDetail() {
   };
 
   const saveRecipe = async () => {
-      const res = await api.post(`${API_BASE_URL}/save-recipe/${id}`);
-      console.log(res.data);
-      
+    const res = await api.post(`${API_BASE_URL}/save-recipe/${id}`);
   };
 
   if (loading) {
@@ -94,9 +121,7 @@ export default function RecipeDetail() {
                     source={require("../../../../resource/Save.png")}
                   ></Image>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.icon}
-                >
+                <TouchableOpacity style={styles.icon}>
                   <Image
                     source={require("../../../../resource/Share.png")}
                   ></Image>

@@ -15,7 +15,7 @@ class UserSavedRecipeController extends Controller
         if (is_string($value) && trim($value) !== '') {
             return array_map(
                 'intval',
-                array_filter(explode(',', $value), fn ($v) => trim($v) !== '')
+                array_filter(explode(',', $value), fn($v) => trim($v) !== '')
             );
         }
 
@@ -64,20 +64,28 @@ class UserSavedRecipeController extends Controller
 
         return $query->whereHas('belongsToRecipe', function ($r) use ($like) {
             $r->where(function ($q) use ($like) {
-                $q->orWhereHas('belongsToRecipeCategory', fn ($qq) =>
+                $q->orWhereHas(
+                    'belongsToRecipeCategory',
+                    fn($qq) =>
+                    $qq->where('name', 'ILIKE', $like)
+                )
+                    ->orWhereHas(
+                        'hasManyRecipeIngredient.belongsToIngredients',
+                        fn($qq) =>
                         $qq->where('name', 'ILIKE', $like)
                     )
-                    ->orWhereHas('hasManyRecipeIngredient.belongsToIngredients', fn ($qq) =>
-                        $qq->where('name', 'ILIKE', $like)
-                    )
-                    ->orWhereHas('hasManyRecipeSeasoning.belongsToIngredients', fn ($qq) =>
+                    ->orWhereHas(
+                        'hasManyRecipeSeasoning.belongsToIngredients',
+                        fn($qq) =>
                         $qq->where('name', 'ILIKE', $like)
                     )
                     ->orWhereHas(
                         'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-                        fn ($qq) => $qq->where('name', 'ILIKE', $like)
+                        fn($qq) => $qq->where('name', 'ILIKE', $like)
                     )
-                    ->orWhereHas('hasManyUtensil.belongsToUtensil', fn ($qq) =>
+                    ->orWhereHas(
+                        'hasManyUtensil.belongsToUtensil',
+                        fn($qq) =>
                         $qq->where('name', 'ILIKE', $like)
                     );
             });
@@ -92,12 +100,16 @@ class UserSavedRecipeController extends Controller
 
         foreach ($thresholds as $t) {
             $candidate = clone $query;
-            $candidate->whereHas('belongsToRecipe', fn ($r) =>
+            $candidate->whereHas(
+                'belongsToRecipe',
+                fn($r) =>
                 $r->where('time', '<=', $t)
             );
 
             if ($candidate->exists()) {
-                return $query->whereHas('belongsToRecipe', fn ($r) =>
+                return $query->whereHas(
+                    'belongsToRecipe',
+                    fn($r) =>
                     $r->where('time', '<=', $t)
                 );
             }
@@ -134,13 +146,17 @@ class UserSavedRecipeController extends Controller
         ])->where('id_user', $user->id);
 
         if (!empty($type)) {
-            $saved->whereHas('belongsToRecipe.belongsToRecipeCategory', fn ($q) =>
+            $saved->whereHas(
+                'belongsToRecipe.belongsToRecipeCategory',
+                fn($q) =>
                 $q->whereIn('name', $type)
             );
         }
 
         if (!empty($difficulties)) {
-            $saved->whereHas('belongsToRecipe', fn ($q) =>
+            $saved->whereHas(
+                'belongsToRecipe',
+                fn($q) =>
                 $this->applyDifficulties($q, $difficulties)
             );
         }
@@ -148,26 +164,28 @@ class UserSavedRecipeController extends Controller
         if (!empty($ingredientCategories)) {
             $saved->whereHas(
                 'belongsToRecipe.hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-                fn ($q) => $this->applyIngredientCategories($q, $ingredientCategories)
+                fn($q) => $this->applyIngredientCategories($q, $ingredientCategories)
             );
         }
 
         if (!empty($ingredients)) {
             $saved->whereHas(
                 'belongsToRecipe.hasManyRecipeIngredient.belongsToIngredients',
-                fn ($q) => $this->applyIngredients($q, $ingredients)
+                fn($q) => $this->applyIngredients($q, $ingredients)
             );
         }
 
         if (!empty($utensils)) {
             $saved->whereHas(
                 'belongsToRecipe.hasManyUtensil.belongsToUtensil',
-                fn ($q) => $this->applyUtensils($q, $utensils)
+                fn($q) => $this->applyUtensils($q, $utensils)
             );
         }
 
         if (!empty($diet)) {
-            $saved->whereHas('belongsToRecipe', fn ($q) =>
+            $saved->whereHas(
+                'belongsToRecipe',
+                fn($q) =>
                 $q->where('diet', $diet)
             );
         }
@@ -181,19 +199,26 @@ class UserSavedRecipeController extends Controller
     public function userSaveRecipe(Request $request)
     {
         $user = Auth::user();
-        $recipeId = intval($request->input('id'));
+        $recipeId = intval(request("id"));
 
         $selected = UserSavedRecipe::where('id_user', $user->id)
             ->where('id_recipe', $recipeId)
             ->first();
 
         if (!$selected) {
-            return UserSavedRecipe::create([
-                'id_user'   => $user->id,
-                'id_recipe' => $recipeId,
-            ]);
-        }
 
-        $selected->delete();
+            $newUserSavedRecipe = new UserSavedRecipe;
+
+            $newUserSavedRecipe->id_user = $user->id;
+            $newUserSavedRecipe->id_recipe = $recipeId;
+
+            $newUserSavedRecipe->save();
+
+            return $newUserSavedRecipe;
+        
+        } else {
+            return UserSavedRecipe::where('id_user', $user->id)
+                ->where('id_recipe', $recipeId)->delete();
+        }
     }
 }
