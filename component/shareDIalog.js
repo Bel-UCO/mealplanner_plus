@@ -1,5 +1,142 @@
-const ShareDialog = ()=>{
+import {
+  Modal,
+  View,
+  Text,
+  Pressable,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
+  Alert,
+} from "react-native";
 
+import * as Clipboard from "expo-clipboard";
+import { API_BASE_URL } from "../util/api";
+
+export default function ShareDialog({ shareUrl, visible, onClose }) {
+  const base = API_BASE_URL.replace(/\/$/, ""); // no trailing slash
+
+  // ✅ always include a slash before the path
+  const landingUrl = `${base}/shared?redirect=${encodeURIComponent(shareUrl)}`;
+  // or if your route is /share, use `${base}/share?...`
+
+  const shareToWhatsApp = async () => {
+    // WhatsApp share endpoint
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(landingUrl)}`;
+
+    try {
+      // canOpenURL isn't very useful for https links; open directly
+      await Linking.openURL(waUrl);
+    } catch (e) {
+      Alert.alert("Error", String(e));
+    }
+  };
+
+  const shareToTelegram = async () => {
+    // Telegram share endpoint: pass the landingUrl as "url"
+    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(
+      landingUrl
+    )}`;
+    try {
+      await Linking.openURL(tgUrl);
+    } catch (e) {
+      Alert.alert("Error", String(e));
+    }
+  };
+
+  const copyToClipboard = async () => {
+    await Clipboard.setStringAsync(landingUrl);
+    Alert.alert("Copied", landingUrl);
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <Pressable style={styles.backdrop} onPress={onClose} />
+
+      <View style={styles.container}>
+        <View style={styles.dialog}>
+          <Text style={styles.title}>Share</Text>
+
+          <View style={styles.row}>
+            <TouchableOpacity onPress={shareToWhatsApp} style={styles.item}>
+              <Image
+                source={require("../resource/WhatsApp.png")}
+                style={styles.iconImg}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.item}>
+              <Image
+                source={require("../resource/Facebook.png")}
+                style={styles.iconImg}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={shareToTelegram} style={styles.item}>
+              <Image
+                source={require("../resource/Telegram.png")}
+                style={styles.iconImg}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={copyToClipboard} style={styles.item}>
+              <Image
+                source={require("../resource/Link.png")}
+                style={styles.iconImg}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
 }
 
-export default ShareDialog
+const styles = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dialog: {
+    width: "70%",
+    backgroundColor: "rgba(255,255,255,0.95)",
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    elevation: 10,
+  },
+  title: {
+    textAlign: "center",
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+
+  // ✅ row is applied here
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  // ✅ each button takes equal space
+  item: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+
+  // ✅ size your icons (otherwise Image may render weird)
+  iconImg: {
+    width: 28,
+    height: 28,
+  },
+});

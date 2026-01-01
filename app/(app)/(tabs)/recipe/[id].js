@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ShareDialog from "../../../../component/shareDialog";
 import {
   View,
   Text,
@@ -13,41 +14,20 @@ import AuthenticatedLayout from "../../../../layout/AuthenticatedLayout";
 import api, { API_BASE_URL } from "../../../../util/api";
 import * as Linking from "expo-linking";
 
-import { Linking, Alert } from "react-native";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
-  const shareUrl = Linking.createURL("/(app)/(tabs)/recipe" + id);
+  const [shareDialog, setShareDialog] = useState(false);
+  const shareUrl = Linking.createURL("/(app)/(tabs)/recipe/" + id);
 
   useEffect(() => {
     loadRecipe();
   }, [id]);
 
-  const shareToWhatsApp = async (message) => {
-    const url = `https://wa.me/?text=${shareUrl}`;
-
-    try {
-      const supported = await Linking.canOpenURL(url);
-      if (!supported) {
-        Alert.alert("Can't open link", url);
-        return;
-      }
-      await Linking.openURL(url);
-    } catch (e) {
-      Alert.alert("Error", String(e));
-    }
-  };
-
-  const shareToTelegram = async () => {
-    const tgUrl = `https://t.me/share/url?text=${shareUrl}`;
-
-    try {
-      await Linking.openURL(tgUrl);
-    } catch (e) {
-      Alert.alert("Error", String(e));
-    }
+  const closeDialog = () => {
+    setShareDialog(false);
   };
 
   const loadRecipe = async () => {
@@ -93,6 +73,7 @@ export default function RecipeDetail() {
   return (
     <AuthenticatedLayout>
       <View style={styles.fullWidth}>
+        <ShareDialog shareUrl={shareUrl} visible={shareDialog} onClose={closeDialog}></ShareDialog>
         <View style={styles.card}>
           <Image source={{ uri: imageUrl }} style={styles.image} />
 
@@ -103,10 +84,6 @@ export default function RecipeDetail() {
 
                 <View style={styles.tagRow}>
                   <Text style={styles.tag}>⏱ {recipe.time} min</Text>
-                  <Text style={styles.tag}>
-                    🔥 Difficulty {recipe.difficulty}
-                  </Text>
-                  <Text style={styles.tag}>🥦 {recipe.diet}</Text>
                 </View>
               </View>
 
@@ -121,7 +98,12 @@ export default function RecipeDetail() {
                     source={require("../../../../resource/Save.png")}
                   ></Image>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.icon}>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => {
+                    setShareDialog(true);
+                  }}
+                >
                   <Image
                     source={require("../../../../resource/Share.png")}
                   ></Image>

@@ -43,4 +43,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/preferences', [UserPreferencesController::class, 'getPreferences']);
     Route::post('/preferences', [UserPreferencesController::class, 'updatePreferences']);
 });
-Route::get('/share/{id}', [RecipeShareController::class, 'show'])->name('recipe.share');
+
+Route::get('/shared', [RecipeShareController::class, 'show'])->name('recipe.share');

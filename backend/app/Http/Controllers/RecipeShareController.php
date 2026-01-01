@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Recipe;
+use Illuminate\Http\Request;
 
 class RecipeShareController extends Controller
 {
-    public function show($id)
+    public function show(Request $request)
     {
-        $recipe = Recipe::with([
-            'hasManyRecipeIngredient.belongsToIngredients',
-            'hasManyRecipeSeasoning.belongsToIngredients',
-            'belongsToRecipeCategory',
-            'hasManyUtensil.belongsToUtensil',
-            'hasManyRecipeIngredient.belongsToIngredients.belongsToIngredientsCategory',
-            'hasManySteps',
-        ])->findOrFail($id);
+        $deepLink = $request->query('redirect');
+        $fallback = "https://expo.dev/client";
 
-        // 🔴 PENTING: scheme HARUS sama dengan app.json Expo
-        $deepLink = "mealplanner://recipe/" . $recipe->id;
+        // Basic validation to prevent open redirects
+        if (!$deepLink || !str_starts_with($deepLink, 'exp://')) {
+            abort(400, 'Invalid redirect URL');
+        }
 
-        return view('share-recipe', compact('recipe', 'deepLink'));
+        return view('deeplink', [
+            'deepLink' => $deepLink,
+            'fallback' => $fallback,
+        ]);
     }
 }
