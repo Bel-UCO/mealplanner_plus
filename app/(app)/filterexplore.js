@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -14,6 +14,12 @@ import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
+// ✅ Diet → disabled category ids (based on your categoryIconList ids)
+const DIET_DISABLED_CATEGORY_IDS = {
+  vegan: [1, 2, 3, 4, 5, 13], // meat/poultry/seafood/processed/egg/dairy
+  vegetarian: [1, 2, 3, 4],  // meat/poultry/seafood/processed
+};
+
 const FilterExplore = () => {
   const router = useRouter();
   const { filterRecipeExplore, saveFilterRecipeExplore } =
@@ -22,6 +28,24 @@ const FilterExplore = () => {
   const [filterObject, setFilterObject] = useState(filterRecipeExplore);
 
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
+
+  const [disabledCategoryIds, setDisabledCategoryIds] = useState([]);
+
+  const disabledCategorySet = useMemo(
+    () => new Set(disabledCategoryIds),
+    [disabledCategoryIds]
+  );
+
+  useEffect(() => {
+    const diet = filterObject?.diet || "";
+    const disabled = DIET_DISABLED_CATEGORY_IDS[diet] || [];
+    setDisabledCategoryIds(disabled);
+
+    setFilterObject((prev) => ({
+      ...prev,
+      ingredient_categories: [],
+    }));
+  }, [filterObject?.diet]);
 
   const categoryIconList = [
     { id: 1, icon: require("../../resource/Meat.png"), label: "Meat" },
@@ -112,6 +136,8 @@ const FilterExplore = () => {
   };
 
   const toggleCategory = (id) => {
+    if (disabledCategorySet.has(id)) return;
+
     setFilterObject((prev) => {
       const exists = prev.ingredient_categories.includes(id);
       const ingredient_categories = exists
@@ -146,6 +172,10 @@ const FilterExplore = () => {
 
   const CategoryFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
+
+    const isSelected = filterObject.ingredient_categories.includes(id);
+    const isDisabled = disabledCategorySet.has(id);
+
     return (
       <Tooltip
         isVisible={showTip}
@@ -154,10 +184,11 @@ const FilterExplore = () => {
         onClose={() => setShowTip(false)}
       >
         <TouchableOpacity
+          disabled={isDisabled}
           style={[
-            styles.squareButton,
-            filterObject.ingredient_categories.includes(id) &&
-              styles.squareButtonActive,
+            styles.squareButton, 
+            isSelected && styles.squareButtonSelected,
+            isDisabled && styles.squareButtonDisabled,
           ]}
           onPress={() => toggleCategory(id)}
           onLongPress={() => setShowTip(true)}
@@ -165,7 +196,10 @@ const FilterExplore = () => {
         >
           <Image
             source={icon}
-            style={styles.typeIconImg}
+            style={[
+              styles.typeIconImg,
+              isDisabled && styles.typeIconImgDisabled,
+            ]}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -175,6 +209,7 @@ const FilterExplore = () => {
 
   const UtensilFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
+
     return (
       <Tooltip
         isVisible={showTip}
@@ -185,7 +220,7 @@ const FilterExplore = () => {
         <TouchableOpacity
           style={[
             styles.squareButton,
-            filterObject.utensils.includes(id) && styles.squareButtonActive,
+            filterObject.utensils.includes(id) && styles.squareButtonSelected,
           ]}
           onPress={() => toggleUtensil(id)}
           onLongPress={() => setShowTip(true)}
@@ -204,7 +239,6 @@ const FilterExplore = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* HEADER */}
         <View style={styles.headerRow}>
           <TouchableOpacity
             onPress={() => {
@@ -217,7 +251,6 @@ const FilterExplore = () => {
         </View>
         <View style={styles.divider} />
 
-        {/* DIFFICULTIES */}
         <Text style={styles.sectionTitle}>DIFFICULTIES</Text>
         <View style={styles.difficultyRow}>
           <TouchableOpacity
@@ -306,7 +339,6 @@ const FilterExplore = () => {
           </TouchableOpacity>
         </View>
 
-        {/* TIME */}
         <Text style={styles.sectionTitle}>TIME</Text>
         <View style={styles.sliderContainer}>
           <View style={styles.sliderWrapper}>
@@ -391,7 +423,7 @@ const FilterExplore = () => {
             style={[
               styles.squareButton,
               filterObject.type.includes("Breakfast") &&
-                styles.squareButtonActive,
+                styles.squareButtonSelected,
             ]}
             onPress={() => handleTypePress("Breakfast")}
           >
@@ -405,7 +437,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type.includes("Lunch") && styles.squareButtonActive,
+              filterObject.type.includes("Lunch") && styles.squareButtonSelected,
             ]}
             onPress={() => handleTypePress("Lunch")}
           >
@@ -419,7 +451,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type.includes("Dinner") && styles.squareButtonActive,
+              filterObject.type.includes("Dinner") && styles.squareButtonSelected,
             ]}
             onPress={() => handleTypePress("Dinner")}
           >
@@ -434,7 +466,7 @@ const FilterExplore = () => {
             style={[
               styles.squareButton,
               filterObject.type.includes("Dessert") &&
-                styles.squareButtonActive,
+                styles.squareButtonSelected,
             ]}
             onPress={() => handleTypePress("Dessert")}
           >
@@ -448,7 +480,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type.includes("Drink") && styles.squareButtonActive,
+              filterObject.type.includes("Drink") && styles.squareButtonSelected,
             ]}
             onPress={() => handleTypePress("Drink")}
           >
@@ -460,13 +492,12 @@ const FilterExplore = () => {
           </TouchableOpacity>
         </View>
 
-        {/* DIET */}
         <Text style={styles.sectionTitle}>DIET</Text>
         <View style={styles.chipRow}>
           <TouchableOpacity
             style={[
               styles.chip,
-              filterObject.diet === "vegan" && styles.chipActive,
+              filterObject.diet === "vegan" && styles.chipSelected,
             ]}
             onPress={() => handleDietPress("vegan")}
           >
@@ -476,7 +507,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.chip,
-              filterObject.diet === "vegetarian" && styles.chipActive,
+              filterObject.diet === "vegetarian" && styles.chipSelected,
             ]}
             onPress={() => handleDietPress("vegetarian")}
           >
@@ -484,7 +515,6 @@ const FilterExplore = () => {
           </TouchableOpacity>
         </View>
 
-        {/* CATEGORY */}
         <Text style={styles.sectionTitle}>CATEGORY</Text>
         <View style={styles.iconGrid}>
           {chunkArray(categoryIconList, 5).map((row, rowIndex) => (
@@ -501,19 +531,17 @@ const FilterExplore = () => {
           ))}
         </View>
 
-        {/* INGREDIENT */}
         <Text style={styles.sectionTitle}>INGREDIENT</Text>
         <AutoComplete
           value={filterObject.ingredients}
           onChange={(newVal) =>
             setFilterObject((prev) => ({
               ...prev,
-              ingredients: newVal, // now full ingredient objects
+              ingredients: newVal,
             }))
           }
         />
 
-        {/* UTENSIL */}
         <Text style={styles.sectionTitle}>UTENSIL</Text>
         <View style={styles.iconGrid}>
           {chunkArray(utensilIconList, 5).map((row, rowIndex) => (
@@ -535,7 +563,6 @@ const FilterExplore = () => {
 };
 
 const styles = StyleSheet.create({
-  // layout
   container: {
     flex: 1,
     backgroundColor: ORANGE,
@@ -543,9 +570,8 @@ const styles = StyleSheet.create({
   scroll: {
     paddingTop: 36,
     paddingHorizontal: 18,
-    paddingBottom: 160, // ⬅️ more space so "APPLY" is above system buttons
+    paddingBottom: 160,
   },
-  // header
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -567,7 +593,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  // section titles
   sectionTitle: {
     marginTop: 10,
     marginBottom: 6,
@@ -576,12 +601,10 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  // difficulties
   difficultyRow: {
     flexDirection: "row",
     marginBottom: 4,
   },
-
   difficultyItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -591,11 +614,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#FFFFFF",
   },
-
   difficultyItemActive: {
     backgroundColor: "#8C8C8C",
   },
-
   checkbox: {
     width: 14,
     height: 14,
@@ -613,7 +634,6 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  // time slider
   sliderContainer: {
     marginTop: 4,
   },
@@ -664,14 +684,12 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  // TYPE layout row
   typeRow: {
     flexDirection: "row",
     marginTop: 4,
     marginBottom: 4,
   },
 
-  // shared square buttons
   squareButton: {
     width: 44,
     height: 44,
@@ -683,7 +701,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  squareButtonActive: {
+  squareButtonSelected: {
+    backgroundColor: "#D9D9D9",
+  },
+
+  squareButtonDisabled: {
     backgroundColor: "#8C8C8C",
   },
 
@@ -691,8 +713,9 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
   },
-  squareIconEmoji: {
-    fontSize: 18,
+
+  typeIconImgDisabled: {
+    opacity: 0.4,
   },
 
   chipRow: {
@@ -707,16 +730,17 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 8,
   },
-  chipActive: {
-    backgroundColor: "#A0A0A0",
+
+  chipSelected: {
+    backgroundColor: "#D9D9D9",
   },
+
   chipText: {
     fontSize: 12,
     fontWeight: "bold",
     color: "#000",
   },
 
-  // category & utensil grid
   iconGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -726,67 +750,6 @@ const styles = StyleSheet.create({
   iconRow: {
     flexDirection: "row",
     marginBottom: 8,
-  },
-
-  // ingredient row
-  ingredientWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F5F5F5",
-    borderRadius: 22,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginTop: 4,
-  },
-  ingredientPill: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-  },
-  ingredientPillActive: {
-    backgroundColor: "#8C8C8C",
-  },
-  ingredientText: {
-    fontSize: 12,
-    color: "#000",
-  },
-  ingredientPlusCircle: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: "#FFF",
-    borderWidth: 1,
-    borderColor: "#000",
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 8,
-    marginRight: "auto",
-  },
-  ingredientPlus: {
-    fontSize: 16,
-    color: "#000",
-  },
-  dropdownArrow: {
-    fontSize: 18,
-    color: "#000",
-    marginLeft: 12,
-  },
-
-  // apply button
-  applyButton: {
-    marginTop: 20,
-    alignSelf: "center",
-    width: "70%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  applyText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
   },
 });
 

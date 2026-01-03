@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -14,13 +14,35 @@ import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
-const FilterExplore = () => {
+const DIET_DISABLED_CATEGORY_IDS = {
+  vegan: [1, 2, 3, 4, 5, 13],
+  vegetarian: [1, 2, 3, 4],
+};
+
+const FilterSaved = () => {
   const router = useRouter();
   const { filterRecipeSaved, saveFilterRecipeSaved } = useFilterRecipeSaved();
 
   const [filterObject, setFilterObject] = useState(filterRecipeSaved);
-
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
+
+  const [disabledCategoryIds, setDisabledCategoryIds] = useState([]);
+
+  const disabledCategorySet = useMemo(
+    () => new Set(disabledCategoryIds),
+    [disabledCategoryIds]
+  );
+
+  useEffect(() => {
+    const diet = filterObject?.diet || "";
+    const disabled = DIET_DISABLED_CATEGORY_IDS[diet] || [];
+    setDisabledCategoryIds(disabled);
+
+    setFilterObject((prev) => ({
+      ...prev,
+      ingredient_categories: [],
+    }));
+  }, [filterObject?.diet]);
 
   const categoryIconList = [
     { id: 1, icon: require("../../resource/Meat.png"), label: "Meat" },
@@ -33,23 +55,11 @@ const FilterExplore = () => {
     },
     { id: 5, icon: require("../../resource/Egg.png"), label: "Egg" },
     { id: 6, icon: require("../../resource/Grain.png"), label: "Grain" },
-    {
-      id: 7,
-      icon: require("../../resource/Vegetable.png"),
-      label: "Vegetable",
-    },
+    { id: 7, icon: require("../../resource/Vegetable.png"), label: "Vegetable" },
     { id: 8, icon: require("../../resource/Fruit.png"), label: "Fruit" },
-    {
-      id: 9,
-      icon: require("../../resource/Root.png"),
-      label: "Root Vegetable",
-    },
+    { id: 9, icon: require("../../resource/Root.png"), label: "Root Vegetable" },
     { id: 10, icon: require("../../resource/Peanut.png"), label: "Nut & Seed" },
-    {
-      id: 11,
-      icon: require("../../resource/Flour.png"),
-      label: "Dry Ingredient",
-    },
+    { id: 11, icon: require("../../resource/Flour.png"), label: "Dry Ingredient" },
     {
       id: 12,
       icon: require("../../resource/Processed_food.png"),
@@ -63,11 +73,7 @@ const FilterExplore = () => {
     { id: 1, icon: require("../../resource/Blender.png"), label: "Blender" },
     { id: 2, icon: require("../../resource/Chopper.png"), label: "Chopper" },
     { id: 3, icon: require("../../resource/Mixer.png"), label: "Mixer" },
-    {
-      id: 4,
-      icon: require("../../resource/Microwave.png"),
-      label: "Microwave",
-    },
+    { id: 4, icon: require("../../resource/Microwave.png"), label: "Microwave" },
     { id: 5, icon: require("../../resource/Oven.png"), label: "Oven" },
     { id: 6, icon: require("../../resource/Grinder.png"), label: "Grinder" },
     { id: 7, icon: require("../../resource/Shaker.png"), label: "Shaker" },
@@ -111,6 +117,8 @@ const FilterExplore = () => {
   };
 
   const toggleCategory = (id) => {
+    if (disabledCategorySet.has(id)) return;
+
     setFilterObject((prev) => {
       const exists = prev.ingredient_categories.includes(id);
       const ingredient_categories = exists
@@ -145,6 +153,10 @@ const FilterExplore = () => {
 
   const CategoryFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
+
+    const isSelected = filterObject.ingredient_categories.includes(id);
+    const isDisabled = disabledCategorySet.has(id);
+
     return (
       <Tooltip
         isVisible={showTip}
@@ -153,10 +165,11 @@ const FilterExplore = () => {
         onClose={() => setShowTip(false)}
       >
         <TouchableOpacity
+          disabled={isDisabled}
           style={[
             styles.squareButton,
-            filterObject.ingredient_categories.includes(id) &&
-              styles.squareButtonActive,
+            isSelected && styles.squareButtonSelected,
+            isDisabled && styles.squareButtonDisabled,
           ]}
           onPress={() => toggleCategory(id)}
           onLongPress={() => setShowTip(true)}
@@ -164,7 +177,10 @@ const FilterExplore = () => {
         >
           <Image
             source={icon}
-            style={styles.typeIconImg}
+            style={[
+              styles.typeIconImg,
+              isDisabled && styles.typeIconImgDisabled,
+            ]}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -184,7 +200,7 @@ const FilterExplore = () => {
         <TouchableOpacity
           style={[
             styles.squareButton,
-            filterObject.utensils.includes(id) && styles.squareButtonActive,
+            filterObject.utensils.includes(id) && styles.squareButtonSelected,
           ]}
           onPress={() => toggleUtensil(id)}
           onLongPress={() => setShowTip(true)}
@@ -203,7 +219,6 @@ const FilterExplore = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* HEADER */}
         <View style={styles.headerRow}>
           <TouchableOpacity
             onPress={() => {
@@ -216,7 +231,6 @@ const FilterExplore = () => {
         </View>
         <View style={styles.divider} />
 
-        {/* DIFFICULTIES */}
         <Text style={styles.sectionTitle}>DIFFICULTIES</Text>
         <View style={styles.difficultyRow}>
           <TouchableOpacity
@@ -305,7 +319,6 @@ const FilterExplore = () => {
           </TouchableOpacity>
         </View>
 
-        {/* TIME */}
         <Text style={styles.sectionTitle}>TIME</Text>
         <View style={styles.sliderContainer}>
           <View style={styles.sliderWrapper}>
@@ -383,14 +396,12 @@ const FilterExplore = () => {
           </View>
         </View>
 
-        {/* TYPE */}
         <Text style={styles.sectionTitle}>TYPE</Text>
         <View style={styles.typeRow}>
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type.includes("Breakfast") &&
-                styles.squareButtonActive,
+              filterObject.type.includes("Breakfast") && styles.squareButtonActive,
             ]}
             onPress={() => handleTypePress("Breakfast")}
           >
@@ -432,8 +443,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.squareButton,
-              filterObject.type.includes("Dessert") &&
-                styles.squareButtonActive,
+              filterObject.type.includes("Dessert") && styles.squareButtonActive,
             ]}
             onPress={() => handleTypePress("Dessert")}
           >
@@ -459,13 +469,12 @@ const FilterExplore = () => {
           </TouchableOpacity>
         </View>
 
-        {/* DIET */}
         <Text style={styles.sectionTitle}>DIET</Text>
         <View style={styles.chipRow}>
           <TouchableOpacity
             style={[
               styles.chip,
-              filterObject.diet === "vegan" && styles.chipActive,
+              filterObject.diet === "vegan" && styles.chipSelected,
             ]}
             onPress={() => handleDietPress("vegan")}
           >
@@ -475,7 +484,7 @@ const FilterExplore = () => {
           <TouchableOpacity
             style={[
               styles.chip,
-              filterObject.diet === "vegetarian" && styles.chipActive,
+              filterObject.diet === "vegetarian" && styles.chipSelected,
             ]}
             onPress={() => handleDietPress("vegetarian")}
           >
@@ -483,7 +492,6 @@ const FilterExplore = () => {
           </TouchableOpacity>
         </View>
 
-        {/* CATEGORY */}
         <Text style={styles.sectionTitle}>CATEGORY</Text>
         <View style={styles.iconGrid}>
           {chunkArray(categoryIconList, 5).map((row, rowIndex) => (
@@ -500,19 +508,17 @@ const FilterExplore = () => {
           ))}
         </View>
 
-        {/* INGREDIENT */}
         <Text style={styles.sectionTitle}>INGREDIENT</Text>
         <AutoComplete
           value={filterObject.ingredients}
           onChange={(newVal) =>
             setFilterObject((prev) => ({
               ...prev,
-              ingredients: newVal, // now full ingredient objects
+              ingredients: newVal,
             }))
           }
         />
 
-        {/* UTENSIL */}
         <Text style={styles.sectionTitle}>UTENSIL</Text>
         <View style={styles.iconGrid}>
           {chunkArray(utensilIconList, 5).map((row, rowIndex) => (
@@ -534,7 +540,6 @@ const FilterExplore = () => {
 };
 
 const styles = StyleSheet.create({
-  // layout
   container: {
     flex: 1,
     backgroundColor: ORANGE,
@@ -542,9 +547,9 @@ const styles = StyleSheet.create({
   scroll: {
     paddingTop: 36,
     paddingHorizontal: 18,
-    paddingBottom: 160, // ⬅️ more space so "APPLY" is above system buttons
+    paddingBottom: 160,
   },
-  // header
+
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -566,7 +571,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  // section titles
   sectionTitle: {
     marginTop: 10,
     marginBottom: 6,
@@ -575,12 +579,10 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  // difficulties
   difficultyRow: {
     flexDirection: "row",
     marginBottom: 4,
   },
-
   difficultyItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -590,11 +592,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#FFFFFF",
   },
-
   difficultyItemActive: {
     backgroundColor: "#8C8C8C",
   },
-
   checkbox: {
     width: 14,
     height: 14,
@@ -612,7 +612,6 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  // time slider
   sliderContainer: {
     marginTop: 4,
   },
@@ -663,14 +662,12 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  // TYPE layout row
   typeRow: {
     flexDirection: "row",
     marginTop: 4,
     marginBottom: 4,
   },
 
-  // shared square buttons
   squareButton: {
     width: 44,
     height: 44,
@@ -686,19 +683,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#8C8C8C",
   },
 
+  squareButtonSelected: {
+    backgroundColor: "#D9D9D9",
+  },
+
+  squareButtonDisabled: {
+    backgroundColor: "#8C8C8C",
+  },
+
   typeIconImg: {
     width: 26,
     height: 26,
   },
-  squareIconEmoji: {
-    fontSize: 18,
+
+  typeIconImgDisabled: {
+    opacity: 0.4,
   },
 
-  // diet chips
   chipRow: {
     flexDirection: "row",
     marginTop: 4,
   },
+
   chip: {
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
@@ -706,9 +712,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 8,
   },
-  chipActive: {
-    backgroundColor: "#A0A0A0",
+
+  chipSelected: {
+    backgroundColor: "#D9D9D9",
   },
+
   chipText: {
     fontSize: 12,
     fontWeight: "bold",
@@ -792,4 +800,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FilterExplore;
+export default FilterSaved;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -14,6 +14,11 @@ import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
+const DIET_DISABLED_CATEGORY_IDS = {
+  vegan: [1, 2, 3, 4, 5, 13], // meat/poultry/seafood/processed/egg/dairy
+  vegetarian: [1, 2, 3, 4],  // meat/poultry/seafood/processed
+};
+
 const Filter = () => {
   const router = useRouter();
   const { filterRecipe, saveFilterRecipe } = useFilterRecipe();
@@ -21,7 +26,23 @@ const Filter = () => {
   const [filterObject, setFilterObject] = useState(JSON.parse(filterRecipe));
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
 
-  const [activeTooltip, setActiveTooltip] = useState(null);
+  const [disabledCategoryIds, setDisabledCategoryIds] = useState([]);
+
+  const disabledCategorySet = useMemo(
+    () => new Set(disabledCategoryIds),
+    [disabledCategoryIds]
+  );
+
+  useEffect(() => {
+    const diet = filterObject?.diet || "";
+    const disabled = DIET_DISABLED_CATEGORY_IDS[diet] || [];
+    setDisabledCategoryIds(disabled);
+
+    setFilterObject((prev) => ({
+      ...prev,
+      ingredient_categories: [],
+    }));
+  }, [filterObject?.diet]);
 
   const categoryIconList = [
     { id: 1, icon: require("../../resource/Meat.png"), label: "Meat" },
@@ -108,6 +129,8 @@ const Filter = () => {
   };
 
   const toggleCategory = (id) => {
+    if (disabledCategorySet.has(id)) return;
+
     setFilterObject((prev) => {
       const exists = prev.ingredient_categories.includes(id);
       const ingredient_categories = exists
@@ -147,6 +170,10 @@ const Filter = () => {
 
   const CategoryFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
+
+    const isSelected = filterObject.ingredient_categories.includes(id);
+    const isDisabled = disabledCategorySet.has(id);
+
     return (
       <Tooltip
         isVisible={showTip}
@@ -155,10 +182,11 @@ const Filter = () => {
         onClose={() => setShowTip(false)}
       >
         <TouchableOpacity
+          disabled={isDisabled}
           style={[
             styles.squareButton,
-            filterObject.ingredient_categories.includes(id) &&
-              styles.squareButtonActive,
+            isSelected && styles.squareButtonSelected,
+            isDisabled && styles.squareButtonDisabled,
           ]}
           onPress={() => toggleCategory(id)}
           onLongPress={() => setShowTip(true)}
@@ -166,7 +194,10 @@ const Filter = () => {
         >
           <Image
             source={icon}
-            style={styles.typeIconImg}
+            style={[
+              styles.typeIconImg,
+              isDisabled && styles.typeIconImgDisabled,
+            ]}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -176,6 +207,9 @@ const Filter = () => {
 
   const UtensilFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
+
+    const isSelected = filterObject.utensils.includes(id);
+
     return (
       <Tooltip
         isVisible={showTip}
@@ -186,7 +220,7 @@ const Filter = () => {
         <TouchableOpacity
           style={[
             styles.squareButton,
-            filterObject.utensils.includes(id) && styles.squareButtonActive,
+            isSelected && styles.squareButtonSelected, 
           ]}
           onPress={() => toggleUtensil(id)}
           onLongPress={() => setShowTip(true)}
@@ -205,18 +239,18 @@ const Filter = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* HEADER */}
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => {
-              applyFilter()
-            }}>
+          <TouchableOpacity
+            onPress={() => {
+              applyFilter();
+            }}
+          >
             <Text style={styles.backArrow}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>FILTER</Text>
         </View>
         <View style={styles.divider} />
 
-        {/* ✅ SEARCH BY */}
         <Text style={styles.sectionTitle}>SEARCH BY</Text>
         <View style={styles.searchByRow}>
           <TouchableOpacity
@@ -332,6 +366,7 @@ const Filter = () => {
             <Text style={styles.difficultyText}>5</Text>
           </TouchableOpacity>
         </View>
+
         <Text style={styles.sectionTitle}>TIME</Text>
         <View style={styles.sliderContainer}>
           <View style={styles.sliderWrapper}>
@@ -407,12 +442,13 @@ const Filter = () => {
             <Text style={styles.timeLabel}>4 H+</Text>
           </View>
         </View>
+
         <Text style={styles.sectionTitle}>DIET</Text>
         <View style={styles.chipRow}>
           <TouchableOpacity
             style={[
               styles.chip,
-              filterObject.diet === "vegan" && styles.chipActive,
+              filterObject.diet === "vegan" && styles.chipSelected,
             ]}
             onPress={() => handleDietPress("vegan")}
           >
@@ -422,13 +458,14 @@ const Filter = () => {
           <TouchableOpacity
             style={[
               styles.chip,
-              filterObject.diet === "vegetarian" && styles.chipActive,
+              filterObject.diet === "vegetarian" && styles.chipSelected,
             ]}
             onPress={() => handleDietPress("vegetarian")}
           >
             <Text style={styles.chipText}>VEGETARIAN</Text>
           </TouchableOpacity>
         </View>
+
         <Text style={styles.sectionTitle}>CATEGORY</Text>
         <View style={styles.iconGrid}>
           {chunkArray(categoryIconList, 5).map((row, rowIndex) => (
@@ -456,6 +493,7 @@ const Filter = () => {
             }))
           }
         />
+
         <Text style={styles.sectionTitle}>UTENSIL</Text>
         <View style={styles.iconGrid}>
           {chunkArray(utensilIconList, 5).map((row, rowIndex) => (
@@ -662,20 +700,28 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF", // not selected = white
     justifyContent: "center",
     alignItems: "center",
     marginRight: 8,
     marginBottom: 8,
   },
 
-  squareButtonActive: {
-    backgroundColor: "#8C8C8C",
+  squareButtonSelected: {
+    backgroundColor: "#D9D9D9", // selected = light gray
+  },
+
+  squareButtonDisabled: {
+    backgroundColor: "#8C8C8C", // disabled = dark gray
   },
 
   typeIconImg: {
     width: 26,
     height: 26,
+  },
+
+  typeIconImgDisabled: {
+    opacity: 0.4,
   },
 
   squareIconEmoji: {
@@ -695,8 +741,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 
-  chipActive: {
-    backgroundColor: "#A0A0A0",
+  chipSelected: {
+    backgroundColor: "#D9D9D9",
   },
 
   chipText: {
