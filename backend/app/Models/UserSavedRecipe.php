@@ -11,8 +11,7 @@ class UserSavedRecipe extends Model
 
     protected $fillable = [
         'id_user',
-        'recipe_id',
-        // add other fields here
+        'id_recipe',
     ];
 
     public function belongsToUser()

@@ -144,26 +144,20 @@ export default function Home() {
     await SecureStore.setItemAsync(CACHED_RECIPES_KEY, JSON.stringify(cleaned));
   };
 
-  // ✅ Manual refresh (search button):
-  // - refresh unlocked recipes
-  // - locked ones stay the same because fetchDataByType returns them immediately
   const manualRefresh = async () => {
     await fetchData();
   };
 
-  // ✅ Lock/unlock per type
   const lockRecipe = async (recipe) => {
     const stored = await SecureStore.getItemAsync(RECIPE_KEY);
     const lockedRecipes = stored ? JSON.parse(stored) : {};
     const type = recipe.type;
 
-    // toggle lock for this type
     if (lockedRecipes[type]?.id === recipe.id) delete lockedRecipes[type];
     else lockedRecipes[type] = { ...recipe, type, locked: true };
 
     await SecureStore.setItemAsync(RECIPE_KEY, JSON.stringify(lockedRecipes));
 
-    // update current UI state
     setData((prev) =>
       prev.map((item) => {
         if (item.type !== type) return item;
@@ -173,7 +167,6 @@ export default function Home() {
       })
     );
 
-    // update cache too (so same-day loads show correct lock icon)
     const cached = await SecureStore.getItemAsync(CACHED_RECIPES_KEY);
     if (cached) {
       try {
@@ -220,7 +213,7 @@ export default function Home() {
         <TouchableOpacity
           style={styles.fab}
           activeOpacity={0.85}
-          onPress={manualRefresh} // ✅ manual change recipes
+          onPress={manualRefresh}
         >
           <Image
             source={require("../../../resource/search-button.png")}

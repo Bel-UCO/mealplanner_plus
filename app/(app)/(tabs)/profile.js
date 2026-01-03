@@ -1,7 +1,6 @@
 // ProfileButtonsScreen.js
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
 import { useRouter } from "expo-router";
@@ -11,18 +10,18 @@ import api from "../../../util/api";
 const ProfileButtonsScreen = () => {
   const { clearToken } = useToken();
 
-  const [user,setUser] = useState();
+  const [user, setUser] = useState();
 
   const router = useRouter();
 
-  useEffect(()=>{
-    fetchData()
-  },[])
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const fetchData = async () =>{
-    const res = await api.get("/user")
-    setUser(res.data)
-  }
+  const fetchData = async () => {
+    const res = await api.get("/user");
+    setUser(res.data);
+  };
 
   return (
     <AuthenticatedLayout>
@@ -30,7 +29,7 @@ const ProfileButtonsScreen = () => {
         {/* Email row */}
         <TouchableOpacity style={styles.row}>
           <Text style={styles.rowText}>{user?.email}</Text>
-          <Icon name="user" size={22} />
+          <Image source={require("../../../resource/Profile.png")} size={24} />
         </TouchableOpacity>
 
         <View style={styles.separator} />
@@ -45,7 +44,7 @@ const ProfileButtonsScreen = () => {
           }
         >
           <Text style={styles.rowText}>SAVED RECIPE</Text>
-          <Icon name="heart" size={24} />
+          <Image source={require("../../../resource/Saved.png")} size={24} />
         </TouchableOpacity>
 
         <View style={styles.separator} />
@@ -58,7 +57,7 @@ const ProfileButtonsScreen = () => {
           }}
         >
           <Text style={styles.rowText}>LOGOUT</Text>
-          <MaterialIcon name="logout" size={24} />
+          <Image source={require("../../../resource/Logout.png")} size={24} />
         </TouchableOpacity>
       </View>
     </AuthenticatedLayout>

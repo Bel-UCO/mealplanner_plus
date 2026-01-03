@@ -32,8 +32,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/recipe', [RecipeController::class, 'getAll']);
-Route::get('/ingredient', [IngredientsController::class, 'getList']);
+Route::middleware('auth:sanctum')->get('/recipe', [RecipeController::class, 'getAll']);
+Route::middleware('auth:sanctum')->get('/ingredient', [IngredientsController::class, 'getList']);
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:sanctum')->get('/recipe-detail/{id}', [RecipeController::class, 'getDetails']);
 Route::middleware('auth:sanctum')->get('/saved-recipe', [UserSavedRecipeController::class, 'getList']);

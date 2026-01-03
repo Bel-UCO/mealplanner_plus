@@ -55,7 +55,7 @@ export default function Layout() {
           tabBarIcon: () => (
             <View style={{ paddingTop: 10 }}>
               <Image
-                source={require("../../../resource/profile.png")}
+                source={require("../../../resource/Profile.png")}
                 style={{ width: 30, height: 30 }}
               />
             </View>

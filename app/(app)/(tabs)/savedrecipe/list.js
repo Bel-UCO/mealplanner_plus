@@ -33,12 +33,12 @@ export default function Explore() {
     Drink: require("../../../../resource/Drink_Randomize.png"),
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchData();
-  }, [filterRecipeSaved]);
+  });
 
   const fetchData = async () => {
-    const filterParam = { ...filterRecipeSaved };    
+    const filterParam = { ...filterRecipeSaved };
 
     filterParam.ingredients = filterParam.ingredients.map(
       (element) => element.id
@@ -82,7 +82,11 @@ export default function Explore() {
               style={styles.categoryIcon}
               resizeMode="contain"
             />
-            <Ionicons name="heart-outline" size={22} color="white" />
+            <Image
+              source={require("../../../../resource/Saved_Explore.png")}
+              style={styles.categoryIcon}
+              resizeMode="contain"
+            />
           </View>
 
           <View style={styles.recipeNameBar}>

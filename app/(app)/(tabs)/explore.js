@@ -34,7 +34,7 @@ export default function Explore() {
 
   useEffect(() => {
     fetchData();
-  }, [filterRecipeExplore]);
+  });
 
   const fetchData = async () => {
     const filterParam = { ...filterRecipeExplore };
@@ -75,7 +75,19 @@ export default function Explore() {
               style={styles.categoryIcon}
               resizeMode="contain"
             />
-            <Ionicons name="heart-outline" size={22} color="white" />
+            {item.is_saved ? (
+              <Image
+                source={require("../../../resource/Saved_Explore.png")}
+                style={styles.categoryIcon}
+                resizeMode="contain"
+              />
+            ) : (
+              <Image
+                source={require("../../../resource/Not_Saved_Explore.png")}
+                style={styles.categoryIcon}
+                resizeMode="contain"
+              />
+            )}
           </View>
 
           <View style={styles.recipeNameBar}>

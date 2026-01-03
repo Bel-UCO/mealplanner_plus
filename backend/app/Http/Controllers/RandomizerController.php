@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Recipe;
+use Illuminate\Support\Facades\Auth;
 
 class RandomizerController extends Controller
 {
@@ -40,6 +41,8 @@ class RandomizerController extends Controller
 
     public function getRecipeFromDb(Request $request)
     {
+        $user = Auth::user();
+
         $difficulties = $request->input('difficulties', []);
         $ingredients  = $request->input('ingredients', []);
         $ingredientCategories = $request->input('ingredient_categories', []);
@@ -67,7 +70,11 @@ class RandomizerController extends Controller
         ])
             ->whereHas('belongsToRecipeCategory', function ($q) {
                 $q->where('name', request('type'));
-            });
+            })->withExists([
+                'hasManyUserSavedRecipes as is_saved' => function ($q) use ($user) {
+                    $q->where('id_user', $user->id);
+                }
+            ]);
 
         if (!empty($difficulties)) {
             $breakfasts = $this->buildQueryDifficulties($breakfasts, $difficulties);
