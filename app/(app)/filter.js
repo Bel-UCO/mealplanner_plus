@@ -207,7 +207,9 @@ const Filter = () => {
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* HEADER */}
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => {
+              applyFilter()
+            }}>
             <Text style={styles.backArrow}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>FILTER</Text>
@@ -469,9 +471,6 @@ const Filter = () => {
             </View>
           ))}
         </View>
-        <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
-          <Text style={styles.applyText}>APPLY</Text>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );

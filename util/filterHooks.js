@@ -114,7 +114,7 @@ export function FilterRecipeProvider({ children }) {
     setTriggerFilterRecipeChange(new Boolean(true));
   }, []);
 
-  const value = { filterRecipe, saveFilterRecipe, triggerFilterRecipeChange };
+  const value = { filterRecipe, saveFilterRecipe, triggerFilterRecipeChange,setTriggerFilterRecipeChange };
 
   return (
     <FilterRecipeContext.Provider value={value}>

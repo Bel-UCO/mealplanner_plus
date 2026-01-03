@@ -16,16 +16,12 @@ import { API_BASE_URL } from "../util/api";
 export default function ShareDialog({ shareUrl, visible, onClose }) {
   const base = API_BASE_URL.replace(/\/$/, ""); // no trailing slash
 
-  // ✅ always include a slash before the path
   const landingUrl = `${base}/shared?redirect=${encodeURIComponent(shareUrl)}`;
-  // or if your route is /share, use `${base}/share?...`
 
   const shareToWhatsApp = async () => {
-    // WhatsApp share endpoint
     const waUrl = `https://wa.me/?text=${encodeURIComponent(landingUrl)}`;
 
     try {
-      // canOpenURL isn't very useful for https links; open directly
       await Linking.openURL(waUrl);
     } catch (e) {
       Alert.alert("Error", String(e));
@@ -33,7 +29,6 @@ export default function ShareDialog({ shareUrl, visible, onClose }) {
   };
 
   const shareToTelegram = async () => {
-    // Telegram share endpoint: pass the landingUrl as "url"
     const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(
       landingUrl
     )}`;

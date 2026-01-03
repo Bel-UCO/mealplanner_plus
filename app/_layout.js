@@ -47,7 +47,6 @@ export default function RootLayout() {
             />
 
             <Stack.Screen name="(app)" options={{ headerShown: false }} />
-            <Stack.Screen name="shared-recipe/[id]" options={{ headerShown: false }} />
           </Stack>
         </FilterRecipeProvider>
       </FilterRecipeExploreProvider>
