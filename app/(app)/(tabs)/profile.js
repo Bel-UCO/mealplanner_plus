@@ -1,14 +1,13 @@
 // ProfileButtonsScreen.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
 import { useRouter } from "expo-router";
-import useToken from "../../../util/useToken";
 import api from "../../../util/api";
+import { useAuth } from "../../../util/useToken";
 
 const ProfileButtonsScreen = () => {
-  const { clearToken } = useToken();
+  const { clearToken } = useAuth();
 
   const [user, setUser] = useState();
 
@@ -52,8 +51,9 @@ const ProfileButtonsScreen = () => {
         {/* Logout row */}
         <TouchableOpacity
           style={styles.row}
-          onPress={async () => {
-            await clearToken();
+          onPress={() => {
+            clearToken();
+            router.dismissAll?.()
           }}
         >
           <Text style={styles.rowText}>LOGOUT</Text>

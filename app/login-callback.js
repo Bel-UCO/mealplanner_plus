@@ -2,11 +2,11 @@
 import React, { useEffect } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, Alert } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import useToken from "../util/useToken";
+import { useAuth } from "../util/useToken";
 
 export default function LoginCallback() {
   const { token } = useLocalSearchParams();
-  const { saveToken } = useToken();
+  const { saveToken } = useAuth();
 
   useEffect(() => {
     const run = async () => {

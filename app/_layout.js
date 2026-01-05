@@ -1,13 +1,13 @@
-// app/_layout.js
 import React, { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
-import useToken from "../util/useToken";
+
+import { AuthProvider, useAuth } from "../util/useToken";
 import { FilterRecipeProvider } from "../util/filterHooks";
 import { FilterRecipeExploreProvider } from "../util/filterHooksExplore";
 import { FilterRecipeSavedProvider } from "../util/filterHooksSaved";
 
-export default function RootLayout() {
-  const { token, loading } = useToken();
+function RootLayoutInner() {
+  const { token, loading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
 
@@ -24,30 +24,30 @@ export default function RootLayout() {
   }, [token, loading, segments]);
 
   return (
+    <Stack
+      screenOptions={{
+        tabBarActiveTintColor: "#000",
+        headerStyle: { backgroundColor: "#FB9637" },
+        headerShadowVisible: false,
+        headerTintColor: "#000",
+        tabBarStyle: { backgroundColor: "#FB9637" },
+      }}
+    >
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="login-callback" options={{ headerShown: false }} />
+      <Stack.Screen name="(app)" options={{ headerShown: false }} />
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <FilterRecipeSavedProvider>
       <FilterRecipeExploreProvider>
         <FilterRecipeProvider>
-          <Stack
-            screenOptions={{
-              tabBarActiveTintColor: "#000",
-              headerStyle: {
-                backgroundColor: "#FB9637",
-              },
-              headerShadowVisible: false,
-              headerTintColor: "#000",
-              tabBarStyle: {
-                backgroundColor: "#FB9637",
-              },
-            }}
-          >
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="login-callback"
-              options={{ headerShown: false }}
-            />
-
-            <Stack.Screen name="(app)" options={{ headerShown: false }} />
-          </Stack>
+          <AuthProvider>
+            <RootLayoutInner />
+          </AuthProvider>
         </FilterRecipeProvider>
       </FilterRecipeExploreProvider>
     </FilterRecipeSavedProvider>

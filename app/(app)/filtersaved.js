@@ -15,8 +15,8 @@ import Tooltip from "react-native-walkthrough-tooltip";
 const ORANGE = "#FB9637";
 
 const DIET_DISABLED_CATEGORY_IDS = {
-  vegan: [1, 2, 3, 4, 5, 13],
-  vegetarian: [1, 2, 3, 4],
+  vegan: [1, 2, 3, 4, 5, 12, 13, 14], // meat/poultry/seafood/processed/egg/dairy
+  vegetarian: [1, 2, 3, 4, 12, 14], // meat/poultry/seafood/processed
 };
 
 const FilterSaved = () => {
@@ -222,7 +222,7 @@ const FilterSaved = () => {
         <View style={styles.headerRow}>
           <TouchableOpacity
             onPress={() => {
-              applyFilter();
+              router.back();
             }}
           >
             <Text style={styles.backArrow}>‹</Text>
@@ -534,6 +534,9 @@ const FilterSaved = () => {
             </View>
           ))}
         </View>
+        <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
+          <Text style={styles.applyText}>APPLY</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );

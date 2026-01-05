@@ -30,6 +30,16 @@ const Header = ({ headText, filterRoute }) => {
     <View style={styles.header}>
       {!showSearch ? (
         <View style={styles.row}>
+          {/* ✅ BACK BUTTON ONLY FOR /filtersaved */}
+          {filterRoute === "/filtersaved" && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.replace("/(app)/(tabs)/profile")}
+            >
+              <Text style={styles.backArrow}>‹</Text>
+            </TouchableOpacity>
+          )}
+
           <Text style={styles.headerText}>{headText}</Text>
 
           <View style={styles.rightIcons}>
@@ -117,18 +127,27 @@ const styles = StyleSheet.create({
     gap: 10,
     marginLeft: "auto",
   },
+
   headerText: {
     color: "#000",
     fontWeight: "bold",
     fontSize: 20,
   },
+
   icon: {
     width: 24,
     height: 24,
     tintColor: "#000",
   },
+
   button: {
     padding: 4,
+  },
+
+  backArrow: {
+    fontSize: 28,
+    color: "#000",
+    lineHeight: 28,
   },
 });
 

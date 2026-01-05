@@ -14,10 +14,9 @@ import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
-// ✅ Diet → disabled category ids (based on your categoryIconList ids)
 const DIET_DISABLED_CATEGORY_IDS = {
-  vegan: [1, 2, 3, 4, 5, 13], // meat/poultry/seafood/processed/egg/dairy
-  vegetarian: [1, 2, 3, 4],  // meat/poultry/seafood/processed
+  vegan: [1, 2, 3, 4, 5, 12, 13, 14], // meat/poultry/seafood/processed/egg/dairy
+  vegetarian: [1, 2, 3, 4, 12, 14], // meat/poultry/seafood/processed
 };
 
 const FilterExplore = () => {
@@ -26,11 +25,9 @@ const FilterExplore = () => {
     useFilterRecipeExplore();
 
   const [filterObject, setFilterObject] = useState(filterRecipeExplore);
-
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(0);
 
   const [disabledCategoryIds, setDisabledCategoryIds] = useState([]);
-
   const disabledCategorySet = useMemo(
     () => new Set(disabledCategoryIds),
     [disabledCategoryIds]
@@ -58,23 +55,11 @@ const FilterExplore = () => {
     },
     { id: 5, icon: require("../../resource/Egg.png"), label: "Egg" },
     { id: 6, icon: require("../../resource/Grain.png"), label: "Grain" },
-    {
-      id: 7,
-      icon: require("../../resource/Vegetable.png"),
-      label: "Vegetable",
-    },
+    { id: 7, icon: require("../../resource/Vegetable.png"), label: "Vegetable" },
     { id: 8, icon: require("../../resource/Fruit.png"), label: "Fruit" },
-    {
-      id: 9,
-      icon: require("../../resource/Root.png"),
-      label: "Root Vegetable",
-    },
+    { id: 9, icon: require("../../resource/Root.png"), label: "Root Vegetable" },
     { id: 10, icon: require("../../resource/Peanut.png"), label: "Nut & Seed" },
-    {
-      id: 11,
-      icon: require("../../resource/Flour.png"),
-      label: "Dry Ingredient",
-    },
+    { id: 11, icon: require("../../resource/Flour.png"), label: "Dry Ingredient" },
     {
       id: 12,
       icon: require("../../resource/Processed_food.png"),
@@ -88,15 +73,18 @@ const FilterExplore = () => {
     { id: 1, icon: require("../../resource/Blender.png"), label: "Blender" },
     { id: 2, icon: require("../../resource/Chopper.png"), label: "Chopper" },
     { id: 3, icon: require("../../resource/Mixer.png"), label: "Mixer" },
-    {
-      id: 4,
-      icon: require("../../resource/Microwave.png"),
-      label: "Microwave",
-    },
+    { id: 4, icon: require("../../resource/Microwave.png"), label: "Microwave" },
     { id: 5, icon: require("../../resource/Oven.png"), label: "Oven" },
     { id: 6, icon: require("../../resource/Grinder.png"), label: "Grinder" },
     { id: 7, icon: require("../../resource/Shaker.png"), label: "Shaker" },
   ];
+
+  const handleSearchByPress = (value) => {
+    setFilterObject((prev) => ({
+      ...prev,
+      search_by: value,
+    }));
+  };
 
   const toggleDifficulty = (value) => {
     setFilterObject((prev) => {
@@ -158,7 +146,12 @@ const FilterExplore = () => {
   };
 
   const applyFilter = () => {
-    saveFilterRecipeExplore(filterObject);
+    const payload = {
+      ...filterObject,
+      search_by: filterObject.search_by || "explore",
+    };
+
+    saveFilterRecipeExplore(payload);
     router.back();
   };
 
@@ -186,7 +179,7 @@ const FilterExplore = () => {
         <TouchableOpacity
           disabled={isDisabled}
           style={[
-            styles.squareButton, 
+            styles.squareButton,
             isSelected && styles.squareButtonSelected,
             isDisabled && styles.squareButtonDisabled,
           ]}
@@ -210,6 +203,8 @@ const FilterExplore = () => {
   const UtensilFilterButtonTemplate = ({ id, icon, label }) => {
     const [showTip, setShowTip] = useState(false);
 
+    const isSelected = filterObject.utensils.includes(id);
+
     return (
       <Tooltip
         isVisible={showTip}
@@ -220,17 +215,13 @@ const FilterExplore = () => {
         <TouchableOpacity
           style={[
             styles.squareButton,
-            filterObject.utensils.includes(id) && styles.squareButtonSelected,
+            isSelected && styles.squareButtonSelected,
           ]}
           onPress={() => toggleUtensil(id)}
           onLongPress={() => setShowTip(true)}
           delayLongPress={250}
         >
-          <Image
-            source={icon}
-            style={styles.typeIconImg}
-            resizeMode="contain"
-          />
+          <Image source={icon} style={styles.typeIconImg} resizeMode="contain" />
         </TouchableOpacity>
       </Tooltip>
     );
@@ -240,103 +231,62 @@ const FilterExplore = () => {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => {
-              applyFilter();
-            }}
-          >
+          <TouchableOpacity onPress={() => router.back()}>
             <Text style={styles.backArrow}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>FILTER</Text>
         </View>
         <View style={styles.divider} />
 
+        {/* ✅ NEW: SEARCH BY (like Filter) */}
+        <Text style={styles.sectionTitle}>SEARCH BY</Text>
+        <View style={styles.searchByRow}>
+          <TouchableOpacity
+            style={styles.searchByItem}
+            onPress={() => handleSearchByPress("explore")}
+          >
+            <View style={styles.radioOuter}>
+              {filterObject.search_by === "explore" && (
+                <View style={styles.radioInner} />
+              )}
+            </View>
+            <Text style={styles.searchByText}>EXPLORE</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.searchByItem}
+            onPress={() => handleSearchByPress("saved")}
+          >
+            <View style={styles.radioOuter}>
+              {filterObject.search_by === "saved" && (
+                <View style={styles.radioInner} />
+              )}
+            </View>
+            <Text style={styles.searchByText}>SAVED</Text>
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.sectionTitle}>DIFFICULTIES</Text>
         <View style={styles.difficultyRow}>
-          <TouchableOpacity
-            style={[
-              styles.difficultyItem,
-              filterObject.difficulties.includes(1) &&
-                styles.difficultyItemActive,
-            ]}
-            onPress={() => toggleDifficulty(1)}
-          >
-            <View
+          {[1, 2, 3, 4, 5].map((lvl) => (
+            <TouchableOpacity
+              key={lvl}
               style={[
-                styles.checkbox,
-                filterObject.difficulties.includes(1) && styles.checkboxActive,
+                styles.difficultyItem,
+                filterObject.difficulties.includes(lvl) &&
+                  styles.difficultyItemActive,
               ]}
-            />
-            <Text style={styles.difficultyText}>1</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.difficultyItem,
-              filterObject.difficulties.includes(2) &&
-                styles.difficultyItemActive,
-            ]}
-            onPress={() => toggleDifficulty(2)}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                filterObject.difficulties.includes(2) && styles.checkboxActive,
-              ]}
-            />
-            <Text style={styles.difficultyText}>2</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.difficultyItem,
-              filterObject.difficulties.includes(3) &&
-                styles.difficultyItemActive,
-            ]}
-            onPress={() => toggleDifficulty(3)}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                filterObject.difficulties.includes(3) && styles.checkboxActive,
-              ]}
-            />
-            <Text style={styles.difficultyText}>3</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.difficultyItem,
-              filterObject.difficulties.includes(4) &&
-                styles.difficultyItemActive,
-            ]}
-            onPress={() => toggleDifficulty(4)}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                filterObject.difficulties.includes(4) && styles.checkboxActive,
-              ]}
-            />
-            <Text style={styles.difficultyText}>4</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.difficultyItem,
-              filterObject.difficulties.includes(5) &&
-                styles.difficultyItemActive,
-            ]}
-            onPress={() => toggleDifficulty(5)}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                filterObject.difficulties.includes(5) && styles.checkboxActive,
-              ]}
-            />
-            <Text style={styles.difficultyText}>5</Text>
-          </TouchableOpacity>
+              onPress={() => toggleDifficulty(lvl)}
+            >
+              <View
+                style={[
+                  styles.checkbox,
+                  filterObject.difficulties.includes(lvl) && styles.checkboxActive,
+                ]}
+              />
+              <Text style={styles.difficultyText}>{lvl}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <Text style={styles.sectionTitle}>TIME</Text>
@@ -345,65 +295,18 @@ const FilterExplore = () => {
             <View style={styles.sliderTrack} />
 
             <View style={styles.sliderDotsRow}>
-              <TouchableOpacity
-                style={[
-                  styles.sliderDotOuter,
-                  selectedTimeIndex === 0 && styles.sliderDotOuterActive,
-                ]}
-                onPress={() => handleTimePress(0)}
-              >
-                {selectedTimeIndex === 0 && (
-                  <View style={styles.sliderDotInner} />
-                )}
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.sliderDotOuter,
-                  selectedTimeIndex === 1 && styles.sliderDotOuterActive,
-                ]}
-                onPress={() => handleTimePress(1)}
-              >
-                {selectedTimeIndex === 1 && (
-                  <View style={styles.sliderDotInner} />
-                )}
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.sliderDotOuter,
-                  selectedTimeIndex === 2 && styles.sliderDotOuterActive,
-                ]}
-                onPress={() => handleTimePress(2)}
-              >
-                {selectedTimeIndex === 2 && (
-                  <View style={styles.sliderDotInner} />
-                )}
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.sliderDotOuter,
-                  selectedTimeIndex === 3 && styles.sliderDotOuterActive,
-                ]}
-                onPress={() => handleTimePress(3)}
-              >
-                {selectedTimeIndex === 3 && (
-                  <View style={styles.sliderDotInner} />
-                )}
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.sliderDotOuter,
-                  selectedTimeIndex === 4 && styles.sliderDotOuterActive,
-                ]}
-                onPress={() => handleTimePress(4)}
-              >
-                {selectedTimeIndex === 4 && (
-                  <View style={styles.sliderDotInner} />
-                )}
-              </TouchableOpacity>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[
+                    styles.sliderDotOuter,
+                    selectedTimeIndex === i && styles.sliderDotOuterActive,
+                  ]}
+                  onPress={() => handleTimePress(i)}
+                >
+                  {selectedTimeIndex === i && <View style={styles.sliderDotInner} />}
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
@@ -419,86 +322,30 @@ const FilterExplore = () => {
         {/* TYPE */}
         <Text style={styles.sectionTitle}>TYPE</Text>
         <View style={styles.typeRow}>
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.type.includes("Breakfast") &&
-                styles.squareButtonSelected,
-            ]}
-            onPress={() => handleTypePress("Breakfast")}
-          >
-            <Image
-              source={require("../../resource/Breakfast.png")}
-              style={styles.typeIconImg}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.type.includes("Lunch") && styles.squareButtonSelected,
-            ]}
-            onPress={() => handleTypePress("Lunch")}
-          >
-            <Image
-              source={require("../../resource/Lunch.png")}
-              style={styles.typeIconImg}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.type.includes("Dinner") && styles.squareButtonSelected,
-            ]}
-            onPress={() => handleTypePress("Dinner")}
-          >
-            <Image
-              source={require("../../resource/Dinner.png")}
-              style={styles.typeIconImg}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.type.includes("Dessert") &&
-                styles.squareButtonSelected,
-            ]}
-            onPress={() => handleTypePress("Dessert")}
-          >
-            <Image
-              source={require("../../resource/Dessert.png")}
-              style={styles.typeIconImg}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.squareButton,
-              filterObject.type.includes("Drink") && styles.squareButtonSelected,
-            ]}
-            onPress={() => handleTypePress("Drink")}
-          >
-            <Image
-              source={require("../../resource/Drink.png")}
-              style={styles.typeIconImg}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
+          {[
+            { key: "Breakfast", icon: require("../../resource/Breakfast.png") },
+            { key: "Lunch", icon: require("../../resource/Lunch.png") },
+            { key: "Dinner", icon: require("../../resource/Dinner.png") },
+            { key: "Dessert", icon: require("../../resource/Dessert.png") },
+            { key: "Drink", icon: require("../../resource/Drink.png") },
+          ].map((t) => (
+            <TouchableOpacity
+              key={t.key}
+              style={[
+                styles.squareButton,
+                filterObject.type.includes(t.key) && styles.squareButtonSelected,
+              ]}
+              onPress={() => handleTypePress(t.key)}
+            >
+              <Image source={t.icon} style={styles.typeIconImg} resizeMode="contain" />
+            </TouchableOpacity>
+          ))}
         </View>
 
         <Text style={styles.sectionTitle}>DIET</Text>
         <View style={styles.chipRow}>
           <TouchableOpacity
-            style={[
-              styles.chip,
-              filterObject.diet === "vegan" && styles.chipSelected,
-            ]}
+            style={[styles.chip, filterObject.diet === "vegan" && styles.chipSelected]}
             onPress={() => handleDietPress("vegan")}
           >
             <Text style={styles.chipText}>VEGAN</Text>
@@ -557,41 +404,23 @@ const FilterExplore = () => {
             </View>
           ))}
         </View>
+
+        <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
+          <Text style={styles.applyText}>APPLY</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: ORANGE,
-  },
-  scroll: {
-    paddingTop: 36,
-    paddingHorizontal: 18,
-    paddingBottom: 160,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  backArrow: {
-    fontSize: 22,
-    marginRight: 12,
-    color: "#000",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#000",
-    marginBottom: 16,
-  },
+  container: { flex: 1, backgroundColor: ORANGE },
+  scroll: { paddingTop: 36, paddingHorizontal: 18, paddingBottom: 160 },
+
+  headerRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
+  backArrow: { fontSize: 22, marginRight: 12, color: "#000" },
+  headerTitle: { fontSize: 18, fontWeight: "bold", color: "#000" },
+  divider: { height: 1, backgroundColor: "#000", marginBottom: 16 },
 
   sectionTitle: {
     marginTop: 10,
@@ -601,10 +430,23 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  difficultyRow: {
-    flexDirection: "row",
-    marginBottom: 4,
+  searchByRow: { flexDirection: "row", marginBottom: 8 },
+  searchByItem: { flexDirection: "row", alignItems: "center", marginRight: 18 },
+  radioOuter: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: "#000",
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 6,
   },
+  radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#000" },
+  searchByText: { fontSize: 12, fontWeight: "bold", color: "#000" },
+
+  difficultyRow: { flexDirection: "row", marginBottom: 4 },
   difficultyItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -614,9 +456,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#FFFFFF",
   },
-  difficultyItemActive: {
-    backgroundColor: "#8C8C8C",
-  },
+  difficultyItemActive: { backgroundColor: "#8C8C8C" },
   checkbox: {
     width: 14,
     height: 14,
@@ -626,26 +466,12 @@ const styles = StyleSheet.create({
     marginRight: 6,
     backgroundColor: "#FFFFFF",
   },
-  checkboxActive: {
-    backgroundColor: "#000000",
-  },
-  difficultyText: {
-    fontSize: 12,
-    color: "#000",
-  },
+  checkboxActive: { backgroundColor: "#000000" },
+  difficultyText: { fontSize: 12, color: "#000" },
 
-  sliderContainer: {
-    marginTop: 4,
-  },
-  sliderWrapper: {
-    height: 18,
-    justifyContent: "center",
-  },
-  sliderTrack: {
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: "#FFF",
-  },
+  sliderContainer: { marginTop: 4 },
+  sliderWrapper: { height: 18, justifyContent: "center" },
+  sliderTrack: { height: 3, borderRadius: 2, backgroundColor: "#FFF" },
   sliderDotsRow: {
     position: "absolute",
     left: 0,
@@ -665,30 +491,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  sliderDotOuterActive: {
-    borderColor: "#1BA1FF",
-  },
-  sliderDotInner: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#1BA1FF",
-  },
+  sliderDotOuterActive: { borderColor: "#1BA1FF" },
+  sliderDotInner: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#1BA1FF" },
   timeLabelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 4,
   },
-  timeLabel: {
-    fontSize: 10,
-    color: "#000",
-  },
+  timeLabel: { fontSize: 10, color: "#000" },
 
-  typeRow: {
-    flexDirection: "row",
-    marginTop: 4,
-    marginBottom: 4,
-  },
+  typeRow: { flexDirection: "row", marginTop: 4, marginBottom: 4 },
 
   squareButton: {
     width: 44,
@@ -700,29 +512,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
   },
+  squareButtonSelected: { backgroundColor: "#D9D9D9" },
+  squareButtonDisabled: { backgroundColor: "#8C8C8C" },
 
-  squareButtonSelected: {
-    backgroundColor: "#D9D9D9",
-  },
+  typeIconImg: { width: 26, height: 26 },
+  typeIconImgDisabled: { opacity: 0.4 },
 
-  squareButtonDisabled: {
-    backgroundColor: "#8C8C8C",
-  },
-
-  typeIconImg: {
-    width: 26,
-    height: 26,
-  },
-
-  typeIconImgDisabled: {
-    opacity: 0.4,
-  },
-
-  chipRow: {
-    flexDirection: "row",
-    marginTop: 4,
-  },
-
+  chipRow: { flexDirection: "row", marginTop: 4 },
   chip: {
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
@@ -730,27 +526,22 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 8,
   },
+  chipSelected: { backgroundColor: "#D9D9D9" },
+  chipText: { fontSize: 12, fontWeight: "bold", color: "#000" },
 
-  chipSelected: {
-    backgroundColor: "#D9D9D9",
-  },
+  iconGrid: { flexDirection: "row", flexWrap: "wrap", marginTop: 4 },
+  iconRow: { flexDirection: "row", marginBottom: 8 },
 
-  chipText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#000",
+  applyButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    width: "70%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    paddingVertical: 10,
+    alignItems: "center",
   },
-
-  iconGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 4,
-  },
-
-  iconRow: {
-    flexDirection: "row",
-    marginBottom: 8,
-  },
+  applyText: { fontSize: 14, fontWeight: "bold", color: "#000" },
 });
 
 export default FilterExplore;
