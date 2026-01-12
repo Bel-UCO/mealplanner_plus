@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RecipeController extends Controller
 {
+    // convert id to array of integers from string
     private function normalizeIds($value): array
     {
         if (is_array($value)) return array_map('intval', $value);
@@ -22,6 +23,7 @@ class RecipeController extends Controller
         return [];
     }
 
+    // recipe category type normalization
     private function normalizeStrings($value): array
     {
         if (is_array($value)) {
@@ -35,26 +37,31 @@ class RecipeController extends Controller
         return [];
     }
 
+    // building query difficulty filters
     private function applyDifficulties($query, array $difficulties)
     {
         return $query->whereIn('difficulty', $difficulties);
     }
 
+    // building query ingredient category filters
     private function applyIngredientCategories($query, array $ingredientCategoryIds)
     {
         return $query->whereIn('id', $ingredientCategoryIds);
     }
 
+    // building query ingredient filters
     private function applyIngredients($query, array $ingredientIds)
     {
         return $query->whereIn('id', $ingredientIds);
     }
 
+    // building query utensil filters
     private function applyUtensils($query, array $utensilIds)
     {
         return $query->whereIn('id', $utensilIds);
     }
 
+    // keyword set
     private function applyKeywordGlobal($query, ?string $keyword)
     {
         $keyword = is_string($keyword) ? trim($keyword) : null;
@@ -90,6 +97,7 @@ class RecipeController extends Controller
         });
     }
 
+    // apply time filter with fallback mechanism
     private function applyTimeFallback($query, ?int $requestedTime)
     {
         if (!$requestedTime) return $query;
@@ -106,6 +114,7 @@ class RecipeController extends Controller
         return $query;
     }
 
+    // explore recipes with filter
     public function getAll(Request $request)
     {
         $difficulties         = (array) $request->input('difficulties', []);
@@ -174,6 +183,7 @@ class RecipeController extends Controller
         return $recipes->get();
     }
 
+    // get one recipe details
     public function getDetails()
     {
 

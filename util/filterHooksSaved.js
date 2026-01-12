@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useState } from "react";
 
 const FilterSavedRecipeContext = createContext(null);
 
+// Component for filter saved recipe storage and retrieval
 export function FilterRecipeSavedProvider({ children }) {
   const [filterRecipeSaved, setFilterRecipeSaved] = useState({
     difficulties: [], // number[]
@@ -28,7 +29,7 @@ export function FilterRecipeSavedProvider({ children }) {
   );
 }
 
-// 🔹 default export = hook (so your old imports still work)
+// default export component for filter saved recipe
 export default function useFilterRecipeSaved() {
   const ctx = useContext(FilterSavedRecipeContext);
   if (!ctx) {

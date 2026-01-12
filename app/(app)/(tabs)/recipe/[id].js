@@ -15,6 +15,7 @@ import AuthenticatedLayout from "../../../../layout/AuthenticatedLayout";
 import api, { API_BASE_URL } from "../../../../util/api";
 import * as Linking from "expo-linking";
 
+// recipe detail screen
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState(null);
@@ -42,11 +43,12 @@ export default function RecipeDetail() {
     Other: require("../../../../resource/Flour.png"),
   };
 
+  // on id change fetch recipe detail
   useEffect(() => {
     loadRecipe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // fetch recipe detail from api
   const loadRecipe = async () => {
     try {
       setLoading(true);
@@ -61,6 +63,7 @@ export default function RecipeDetail() {
     }
   };
 
+  // hit api save recipe
   const saveRecipe = async () => {
     try {
       await api.post(`${API_BASE_URL}/save-recipe/${id}`);
@@ -70,6 +73,7 @@ export default function RecipeDetail() {
     }
   };
 
+  // hit storage on supabase bucket of image
   const imageUrl = useMemo(() => {
     if (!recipe?.image) return null;
     return (

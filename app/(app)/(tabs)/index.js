@@ -21,6 +21,7 @@ const CACHED_DATE_KEY = "CACHED_DAILY_RECIPES_DATE";
 
 const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Dessert", "Drink"];
 
+// current date to check cache validity
 const getTodayKey = () => {
   // Local date as YYYY-MM-DD
   const now = new Date();
@@ -30,29 +31,29 @@ const getTodayKey = () => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+// randomizer home screen
 export default function Home() {
   const [data, setData] = useState([]);
   const { triggerFilterRecipeChange, filterRecipe, setTriggerFilterRecipeChange } =
     useFilterRecipe();
   const router = useRouter();
 
-  // prevents the trigger effect from fetching before we decide cache vs refresh
   const didBootstrap = useRef(false);
 
-  // ✅ BOOTSTRAP: if new day → auto refresh. if same day → use cached recipes.
+  // if new day auto refresh. if same day use cached recipes.
   useEffect(() => {
     const bootstrap = async () => {
       const today = getTodayKey();
       const savedDate = await SecureStore.getItemAsync(CACHED_DATE_KEY);
 
-      // New day (or never saved) => trigger auto refresh
+      // New day (or never saved) = trigger auto refresh
       if (!savedDate || savedDate !== today) {
         didBootstrap.current = true;
         setTriggerFilterRecipeChange(new Boolean(true));
         return;
       }
 
-      // Same day => try use cached recipes
+      // Same day = try use cached recipes
       const cached = await SecureStore.getItemAsync(CACHED_RECIPES_KEY);
       if (cached) {
         try {
@@ -72,7 +73,6 @@ export default function Home() {
           didBootstrap.current = true;
           return;
         } catch (e) {
-          // fall through to fetch if cache is corrupted
         }
       }
 
@@ -84,14 +84,14 @@ export default function Home() {
     bootstrap();
   }, [setTriggerFilterRecipeChange]);
 
-  // ✅ Whenever trigger changes (auto new day, or other trigger usage) → fetch
+  // Whenever trigger changes (auto new day, or other trigger usage) → fetch
   useEffect(() => {
     if (!didBootstrap.current) return;
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerFilterRecipeChange]);
 
-  // ✅ Fetch by meal type:
+  // Fetch by meal type:
   // - If locked for that type: return it (never change)
   // - Else: call API to randomize
   const fetchDataByType = async (type) => {
@@ -129,7 +129,7 @@ export default function Home() {
     return recipe ? { ...recipe, type, locked: false } : null;
   };
 
-  // ✅ Fetch all meal types, keep locked ones, randomize unlocked ones, then cache for today
+  // Fetch all meal types, keep locked ones, randomize unlocked ones, then cache for today
   const fetchData = async () => {
     const results = await Promise.all(
       MEAL_TYPES.map((type) => fetchDataByType(type))

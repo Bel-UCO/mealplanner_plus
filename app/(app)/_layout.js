@@ -1,6 +1,6 @@
-// app/(app)/_layout.js
 import { Drawer } from "expo-router/drawer";
 
+// screen layout and navigation for filter
 export default function AppLayout() {
   return (
     <Drawer

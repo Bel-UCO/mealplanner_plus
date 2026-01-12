@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 class RecipeShareController extends Controller
 {
+    // on click url reroute to app
     public function show(Request $request)
     {
         $deepLink = $request->query('redirect');

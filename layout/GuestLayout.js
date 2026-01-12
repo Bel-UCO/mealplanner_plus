@@ -1,8 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
+// Layout for guest users
 const GuestLayout = (props) => {
-
-
   return <View style={styles.container}>{props.children}</View>;
 };
 

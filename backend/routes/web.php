@@ -21,9 +21,11 @@ use App\Http\Controllers\RecipeShareController;
 |
 */
 
+// google oauth routes
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
+// if auth done on mobile, show a simple page to close the window
 Route::get('/auth/google/mobile-done', function () {
     return '<html><body><h1>You can close this window</h1></body></html>';
 });
@@ -32,6 +34,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// app routes for authenticated users
 Route::middleware('auth:sanctum')->get('/recipe', [RecipeController::class, 'getAll']);
 Route::middleware('auth:sanctum')->get('/ingredient', [IngredientsController::class, 'getList']);
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'getUser']);
@@ -44,4 +47,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/preferences', [UserPreferencesController::class, 'updatePreferences']);
 });
 
+// route for redirecting shared recipe link
 Route::get('/shared', [RecipeShareController::class, 'show'])->name('recipe.share');

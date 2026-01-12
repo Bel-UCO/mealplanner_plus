@@ -4,6 +4,7 @@ import {
   View,
 } from "react-native";
 
+// recipe global filter input field component
 const HeaderInput = ({
   value,
   onChangeText,

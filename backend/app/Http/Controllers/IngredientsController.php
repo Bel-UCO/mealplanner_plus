@@ -8,6 +8,7 @@ class IngredientsController extends Controller
 {
     //
 
+    // get ingredient list with optional name filter
     public function getList()
     {
         $ingredientList = Ingredients::where(

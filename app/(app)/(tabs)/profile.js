@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import api from "../../../util/api";
 import { useAuth } from "../../../util/useToken";
 
+// profile tab screen
 const ProfileButtonsScreen = () => {
   const { clearToken } = useAuth();
 

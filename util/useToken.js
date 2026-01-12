@@ -5,6 +5,7 @@ const TOKEN_KEY = "auth_token";
 
 const AuthContext = createContext(null);
 
+// Component for auth storage and retrieval
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// default export component for authentication
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used inside AuthProvider");

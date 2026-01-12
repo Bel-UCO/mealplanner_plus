@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UserPreferencesController extends Controller
 {
+
+    // join ingredients to string or null
     private function joinOrNull($value): ?string
     {
         if (is_array($value)) {
@@ -23,6 +25,7 @@ class UserPreferencesController extends Controller
         return null;
     }
 
+    // convert ingredients string to json or null
     private function ingredientToJsonOrNull($value): ?string
     {
         if ($value === null) return null;
@@ -55,12 +58,14 @@ class UserPreferencesController extends Controller
         return empty($decoded2) ? null : json_encode($decoded2, JSON_UNESCAPED_UNICODE);
     }
 
+    // get last user saved randomized filter
     public function getPreferences(Request $request)
     {
         $user = Auth::user();
         return UserPreferences::where("id_user", "=", $user->id)->first();
     }
 
+    // update last user saved randomized filter
     public function updatePreferences(Request $request)
     {
         $user = $request->user();

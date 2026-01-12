@@ -9,6 +9,7 @@ use App\Models\UserPreferences;
 
 class GoogleAuthController extends Controller
 {
+    // redirect to google page
     public function redirect(Request $request)
     {
         if ($request->has('redirect_back')) {
@@ -18,6 +19,7 @@ class GoogleAuthController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
+    // redirect to app route with token
     public function callback(Request $request)
     {
         $googleUser = Socialite::driver('google')->user();

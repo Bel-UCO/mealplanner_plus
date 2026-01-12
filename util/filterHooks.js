@@ -12,6 +12,7 @@ const RECIPE_KEY = "filter_recipe";
 
 const FilterRecipeContext = createContext(null);
 
+// Component for filter randomize recipe storage and retrieval
 export function FilterRecipeProvider({ children }) {
   const [filterRecipe, setFilterRecipe] = useState(
     JSON.stringify({
@@ -66,7 +67,7 @@ export function FilterRecipeProvider({ children }) {
 
         ingredient_categories: parseCsv(pref.category, (x) => x),
 
-        // ✅ utensils should be number[]
+        // utensils should be number[]
         utensils: parseCsv(pref.utensil, (x) => Number(x)).filter(
           (n) => !Number.isNaN(n)
         ),
@@ -122,6 +123,7 @@ export function FilterRecipeProvider({ children }) {
   );
 }
 
+// default export component for filter recipe recipe
 export default function useFilterRecipe() {
   const ctx = useContext(FilterRecipeContext);
   if (!ctx) {

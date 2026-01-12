@@ -19,7 +19,7 @@ const Login = () => {
     try {
       const base = API_BASE_URL.replace(/\/$/, "");
 
-      // 👉 Expo will turn this into something like:
+      // Expo will turn this into something like:
       // exp://192.168.1.11:8081/--/login-callback
       const redirectBack = Linking.createURL("login-callback");
       console.log("Redirect back URL:", redirectBack);

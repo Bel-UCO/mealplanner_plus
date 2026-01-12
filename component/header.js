@@ -5,6 +5,7 @@ import HeaderInput from "./headerInput";
 import useFilterRecipeExplore from "../util/filterHooksExplore";
 import useFilterRecipeSaved from "../util/filterHooksSaved";
 
+// header component for something related to recipe such as explore and saved recipe
 const Header = ({ headText, filterRoute }) => {
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);

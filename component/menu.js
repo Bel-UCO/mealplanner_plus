@@ -8,6 +8,7 @@ const categoryIcons = {
   Drink: require("../resource/Drink_Randomize.png"),
 };
 
+// Menu card component for randomized recipe list
 const Menu = ({
   title,
   image,

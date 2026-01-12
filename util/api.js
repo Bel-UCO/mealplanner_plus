@@ -1,7 +1,8 @@
-// src/api.js
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
+
+// set where API is hosted
 export const API_BASE_URL = "https://localizable-superdelicate-mae.ngrok-free.dev";
 
 const api = axios.create({
@@ -9,7 +10,7 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Attach token from SecureStore before every request
+// every api request if they got token add token to header
 api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync("auth_token");

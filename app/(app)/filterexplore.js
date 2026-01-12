@@ -14,11 +14,13 @@ import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
+// exception id map for diets
 const DIET_DISABLED_CATEGORY_IDS = {
-  vegan: [1, 2, 3, 4, 5, 12, 13, 14], // meat/poultry/seafood/processed/egg/dairy
-  vegetarian: [1, 2, 3, 4, 12, 14], // meat/poultry/seafood/processed
+  vegan: [1, 2, 3, 4, 5, 12, 13, 14],
+  vegetarian: [1, 2, 3, 4, 12, 14],
 };
 
+// Explore filter screen
 const FilterExplore = () => {
   const router = useRouter();
   const { filterRecipeExplore, saveFilterRecipeExplore } =
@@ -237,34 +239,6 @@ const FilterExplore = () => {
           <Text style={styles.headerTitle}>FILTER</Text>
         </View>
         <View style={styles.divider} />
-
-        {/* ✅ NEW: SEARCH BY (like Filter) */}
-        <Text style={styles.sectionTitle}>SEARCH BY</Text>
-        <View style={styles.searchByRow}>
-          <TouchableOpacity
-            style={styles.searchByItem}
-            onPress={() => handleSearchByPress("explore")}
-          >
-            <View style={styles.radioOuter}>
-              {filterObject.search_by === "explore" && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.searchByText}>EXPLORE</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.searchByItem}
-            onPress={() => handleSearchByPress("saved")}
-          >
-            <View style={styles.radioOuter}>
-              {filterObject.search_by === "saved" && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.searchByText}>SAVED</Text>
-          </TouchableOpacity>
-        </View>
 
         <Text style={styles.sectionTitle}>DIFFICULTIES</Text>
         <View style={styles.difficultyRow}>

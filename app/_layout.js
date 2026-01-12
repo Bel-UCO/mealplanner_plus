@@ -6,6 +6,7 @@ import { FilterRecipeProvider } from "../util/filterHooks";
 import { FilterRecipeExploreProvider } from "../util/filterHooksExplore";
 import { FilterRecipeSavedProvider } from "../util/filterHooksSaved";
 
+// screen layout and navigation for main app for guest user or gateway for authenticated users
 function RootLayoutInner() {
   const { token, loading } = useAuth();
   const router = useRouter();
@@ -40,6 +41,8 @@ function RootLayoutInner() {
   );
 }
 
+
+// set storage hooks for app container
 export default function RootLayout() {
   return (
     <FilterRecipeSavedProvider>

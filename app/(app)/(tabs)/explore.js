@@ -11,7 +11,6 @@ import {
   Image,
 } from "react-native";
 
-import Ionicons from "react-native-vector-icons/Ionicons";
 import AuthenticatedLayout from "../../../layout/AuthenticatedLayout";
 import api, { API_BASE_URL } from "../../../util/api";
 import useFilterRecipeExplore from "../../../util/filterHooksExplore";
@@ -19,6 +18,7 @@ import { useRouter } from "expo-router";
 
 const ORANGE = "#ff9a20";
 
+// explore recipe tab screen
 export default function Explore() {
   const [data, setData] = useState([]);
   const { filterRecipeExplore } = useFilterRecipeExplore();
@@ -36,6 +36,7 @@ export default function Explore() {
     fetchData();
   });
 
+  // fetch explore recipe data from api
   const fetchData = async () => {
     const filterParam = { ...filterRecipeExplore };
 
@@ -48,6 +49,7 @@ export default function Explore() {
     setData(res.data); // make sure this is an array
   };
 
+  // template render recipe card at explore
   const renderRecipe = ({ item }) => {
     return (
       <TouchableOpacity

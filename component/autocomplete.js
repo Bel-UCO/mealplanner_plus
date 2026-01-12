@@ -11,6 +11,7 @@ import { API_BASE_URL } from "../util/api";
 
 const API_URL = API_BASE_URL + "/ingredient";
 
+// auto complete for ingredient filter selection
 export default function AutoComplete({ value = [], onChange }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -19,7 +20,6 @@ export default function AutoComplete({ value = [], onChange }) {
   // Fetch full ingredient objects
   useEffect(() => {
     if (!search.trim()) {
-      // 👇 keep old options; just don't fetch when empty
       return;
     }
 
@@ -110,17 +110,6 @@ export default function AutoComplete({ value = [], onChange }) {
       {/* Dropdown */}
       {open && (
         <View style={styles.dropdown}>
-          {/* Optional: separate search bar inside dropdown (can be removed) */}
-          {/* 
-          <TextInput
-            placeholder="Search ingredient..."
-            value={search}
-            onChangeText={setSearch}
-            style={styles.searchBar}
-            placeholderTextColor="#aaa"
-          />
-          */}
-
           <ScrollView
             style={{ maxHeight: 180 }}
             keyboardShouldPersistTaps="handled"

@@ -14,11 +14,14 @@ import Tooltip from "react-native-walkthrough-tooltip";
 
 const ORANGE = "#FB9637";
 
+// exception id map for diets
 const DIET_DISABLED_CATEGORY_IDS = {
-  vegan: [1, 2, 3, 4, 5, 12, 13, 14], // meat/poultry/seafood/processed/egg/dairy
-  vegetarian: [1, 2, 3, 4, 12, 14], // meat/poultry/seafood/processed
+  vegan: [1, 2, 3, 4, 5, 12, 13, 14],
+  vegetarian: [1, 2, 3, 4, 12, 14],
 };
 
+
+// Randomize filter screen
 const Filter = () => {
   const router = useRouter();
   const { filterRecipe, saveFilterRecipe } = useFilterRecipe();

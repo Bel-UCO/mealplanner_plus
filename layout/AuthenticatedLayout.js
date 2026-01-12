@@ -1,5 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
+// Layout for authenticated users
 const AuthenticatedLayout = (props) => {
 
   return <View style={styles.container}>{props.children}</View>;

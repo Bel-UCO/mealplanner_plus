@@ -13,6 +13,7 @@ import {
 import * as Clipboard from "expo-clipboard";
 import { API_BASE_URL } from "../util/api";
 
+// template share dialog component for sharing recipe via WhatsApp, Telegram, Facebook, or copying link.
 export default function ShareDialog({ shareUrl, visible, onClose }) {
   const base = API_BASE_URL.replace(/\/$/, ""); // no trailing slash
 
@@ -115,21 +116,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  // ✅ row is applied here
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
 
-  // ✅ each button takes equal space
   item: {
     flex: 1,
     alignItems: "center",
     paddingVertical: 8,
   },
 
-  // ✅ size your icons (otherwise Image may render weird)
   iconImg: {
     width: 28,
     height: 28,

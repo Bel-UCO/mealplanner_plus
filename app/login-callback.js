@@ -1,9 +1,9 @@
-// app/login-callback.js
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, Alert } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useAuth } from "../util/useToken";
 
+// login route to set token and reroute and logout route
 export default function LoginCallback() {
   const { token } = useLocalSearchParams();
   const { saveToken } = useAuth();
@@ -21,9 +21,7 @@ export default function LoginCallback() {
         console.log("Saving token from deep link:", token);
         await saveToken(String(token));
 
-        // ✅ Navigate to your logged-in area
-        // change this to whatever your main screen is:
-        // e.g. router.replace("/(apps)/(tabs)");
+        // Navigate to your logged-in area
         router.replace("/(app)/(tabs)"); // back to login/home
       } catch (e) {
         console.log("Error saving token:", e);

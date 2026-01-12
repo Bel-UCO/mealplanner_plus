@@ -8,26 +8,32 @@ use Illuminate\Support\Facades\Auth;
 
 class RandomizerController extends Controller
 {
+
+    // building query difficulty filters
     public function buildQueryDifficulties($query, $difficulties)
     {
         return $query->whereIn('difficulty', $difficulties);
     }
 
+    // building query ingredient category filters
     public function buildQueryIngredientCategory($query, $ingredientCategories)
     {
         return $query->whereIn('id', $ingredientCategories);
     }
 
+    // building query ingredient filters
     public function buildQueryIngredient($query, $ingredients)
     {
         return $query->whereIn('id', $ingredients);
     }
 
+    // building query utensil filters
     public function buildQueryUtensil($query, $utensils)
     {
         return $query->whereIn('id', $utensils);
     }
 
+    // randomize meal plan based on user saved recipe or recipe db
     public function randomizeMealPlan(Request $request)
     {
         if (request("search_by") === "explore") {
@@ -39,6 +45,7 @@ class RandomizerController extends Controller
         }
     }
 
+    // get recipe from db with filter setted filters
     public function getRecipeFromDb(Request $request)
     {
         $user = Auth::user();

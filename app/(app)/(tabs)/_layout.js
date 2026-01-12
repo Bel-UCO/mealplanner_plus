@@ -1,13 +1,8 @@
 import { Tabs, useRouter } from "expo-router";
 import Header from "../../../component/header";
-import {
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text,
-} from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 
+// screen layout and navigation for main app for authenticated users
 export default function Layout() {
   const router = useRouter();
 
@@ -16,16 +11,7 @@ export default function Layout() {
       <View style={styles.header}>
         <View style={styles.row}>
           <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-            {/* Option A: use text arrow */}
             <Text style={styles.backArrow}>‹</Text>
-
-            {/* Option B: if you have a back icon, use this instead:
-            <Image
-              source={require("../../../resource/back.png")}
-              style={styles.icon}
-              resizeMode="contain"
-            />
-            */}
           </TouchableOpacity>
 
           <Text style={styles.headerText}>{title}</Text>
