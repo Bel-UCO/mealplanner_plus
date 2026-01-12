@@ -34,8 +34,11 @@ const getTodayKey = () => {
 // randomizer home screen
 export default function Home() {
   const [data, setData] = useState([]);
-  const { triggerFilterRecipeChange, filterRecipe, setTriggerFilterRecipeChange } =
-    useFilterRecipe();
+  const {
+    triggerFilterRecipeChange,
+    filterRecipe,
+    setTriggerFilterRecipeChange,
+  } = useFilterRecipe();
   const router = useRouter();
 
   const didBootstrap = useRef(false);
@@ -72,8 +75,7 @@ export default function Home() {
           setData(merged);
           didBootstrap.current = true;
           return;
-        } catch (e) {
-        }
+        } catch (e) {}
       }
 
       // No cache / bad cache => fetch
@@ -106,22 +108,27 @@ export default function Home() {
     const filterParam = JSON.parse(filterRecipe);
     filterParam.ingredients = (filterParam.ingredients ?? []).map((x) => x.id);
 
-    let res = await api.get(`${API_BASE_URL}/randomize`, {
-      params: {
-        difficulties: [],
-        ingredients: [],
-        ingredient_categories: [],
-        utensils: [],
-        diet: filterParam?.diet,
-        time: 30,
-        search_by: "explore",
-        type,
-      },
-    });
+    let res;
+    try {
+      res = await api.get(`${API_BASE_URL}/randomize`, {
+        params: { ...filterParam, type },
+      });
+    } catch (e) {
+      console.log("ERROR FETCHING RANDOMIZED RECIPE:", e);
+    }
 
     if (!res?.data?.length) {
       res = await api.get(`${API_BASE_URL}/randomize`, {
-        params: { ...filterParam, type },
+        params: {
+          difficulties: [],
+          ingredients: [],
+          ingredient_categories: [],
+          utensils: [],
+          diet: filterParam?.diet,
+          time: 30,
+          search_by: "explore",
+          type,
+        },
       });
     }
 
@@ -162,7 +169,8 @@ export default function Home() {
       prev.map((item) => {
         if (item.type !== type) return item;
 
-        const isNowLocked = !!lockedRecipes[type] && lockedRecipes[type].id === item.id;
+        const isNowLocked =
+          !!lockedRecipes[type] && lockedRecipes[type].id === item.id;
         return { ...item, locked: isNowLocked };
       })
     );
@@ -173,7 +181,8 @@ export default function Home() {
         const cachedData = JSON.parse(cached);
         const updated = cachedData.map((item) => {
           if (item.type !== type) return item;
-          const isNowLocked = !!lockedRecipes[type] && lockedRecipes[type].id === item.id;
+          const isNowLocked =
+            !!lockedRecipes[type] && lockedRecipes[type].id === item.id;
           return { ...item, locked: isNowLocked };
         });
         await SecureStore.setItemAsync(
