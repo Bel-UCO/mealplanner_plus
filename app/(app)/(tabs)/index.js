@@ -128,7 +128,7 @@ export default function Home() {
           diet: filterParam?.diet,
           time: 30,
           search_by: "explore",
-          type,
+          type:type,
         },
       });
     }
