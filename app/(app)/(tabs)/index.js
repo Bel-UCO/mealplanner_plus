@@ -110,8 +110,9 @@ export default function Home() {
 
     let res;
     try {
+      console.log({ ...filterParam, type: type },);
       res = await api.get(`${API_BASE_URL}/randomize`, {
-        params: { ...filterParam, type },
+        params: { ...filterParam, type: type },
       });
     } catch (e) {
       console.log("ERROR FETCHING RANDOMIZED RECIPE:", e);
