@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import ShareDialog from "../../../../component/shareDialog";
 import {
   View,
   Text,
@@ -14,6 +13,7 @@ import { useLocalSearchParams } from "expo-router";
 import AuthenticatedLayout from "../../../../layout/AuthenticatedLayout";
 import api, { API_BASE_URL } from "../../../../util/api";
 import * as Linking from "expo-linking";
+import ShareDialog from "../../../../component/dialogShare";
 
 // recipe detail screen
 export default function RecipeDetail() {
