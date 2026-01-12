@@ -7,9 +7,9 @@ const FilterSavedRecipeContext = createContext(null);
 export function FilterRecipeSavedProvider({ children }) {
   const [filterRecipeSaved, setFilterRecipeSaved] = useState({
     difficulties: [], // number[]
-    ingredients: [], // string[]
-    ingredient_categories: [], // string[]
-    utensils: [], // string[]
+    ingredients: [], // number[]
+    ingredient_categories: [], // number[]
+    utensils: [], // number[]
     diet: "", // "vegan" | "vegetarian" | ""
     time: 30, // minutes
     type: [],
@@ -17,7 +17,17 @@ export function FilterRecipeSavedProvider({ children }) {
 
   const saveFilterRecipeSaved = useCallback((newFilterRecipeSaved) => {
     if (!newFilterRecipeSaved) return;
-    setFilterRecipeSaved(newFilterRecipeSaved); // updates everyone using the context
+
+    const normalized = {
+      ...newFilterRecipeSaved,
+      ingredient_categories: Array.isArray(newFilterRecipeSaved.ingredient_categories)
+        ? newFilterRecipeSaved.ingredient_categories
+            .map((x) => Number(x))
+            .filter((n) => !Number.isNaN(n))
+        : [],
+    };
+
+    setFilterRecipeSaved(normalized); // updates everyone using the context
   }, []);
 
   const value = { filterRecipeSaved, saveFilterRecipeSaved };

@@ -18,7 +18,7 @@ export function FilterRecipeProvider({ children }) {
     JSON.stringify({
       difficulties: [], // number[]
       ingredients: [], // object[]
-      ingredient_categories: [], // string[]
+      ingredient_categories: [], // number[]
       utensils: [], // number[]
       diet: "", // "vegan" | "vegetarian" | ""
       time: 30, // minutes
@@ -65,7 +65,9 @@ export function FilterRecipeProvider({ children }) {
         // keep ingredient objects exactly as backend
         ingredients,
 
-        ingredient_categories: parseCsv(pref.category, (x) => x),
+        ingredient_categories: parseCsv(pref.category, (x) => Number(x)).filter(
+          (n) => !Number.isNaN(n)
+        ),
 
         // utensils should be number[]
         utensils: parseCsv(pref.utensil, (x) => Number(x)).filter(
@@ -107,9 +109,17 @@ export function FilterRecipeProvider({ children }) {
 
   const saveFilterRecipe = useCallback(async (newFilterRecipe) => {
     if (!newFilterRecipe) return;
-    const asString = JSON.stringify(newFilterRecipe);
+    const normalized = {
+      ...newFilterRecipe,
+      ingredient_categories: Array.isArray(newFilterRecipe.ingredient_categories)
+        ? newFilterRecipe.ingredient_categories
+            .map((x) => Number(x))
+            .filter((n) => !Number.isNaN(n))
+        : [],
+    };
+    const asString = JSON.stringify(normalized);
     await SecureStore.setItemAsync(RECIPE_KEY, asString);
-    saveUserPreference(newFilterRecipe);
+    saveUserPreference(normalized);
     setFilterRecipe(asString);
     setTriggerFilterRecipeChange(new Boolean(true));
   }, []);
