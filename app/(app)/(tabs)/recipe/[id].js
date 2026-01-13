@@ -268,14 +268,15 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
 
   headerRow: {
+    width:"100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
 
-  title: { fontSize: 22, fontWeight: "900", textTransform: "uppercase" },
+  title: { fontSize: 22, width:"50%", fontWeight: "900", textTransform: "uppercase" },
 
-  iconGroup: { flexDirection: "row", gap: 10 },
+  iconGroup: { flexDirection: "row" },
   actionBtn: {
     width: 42,
     height: 42,
